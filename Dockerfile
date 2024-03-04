@@ -8,9 +8,9 @@ RUN apt -y update
 RUN apt-get -y install curl
 RUN curl -sSL https://get.haskellstack.org/ | sh
 ENV PATH="/root/.local/bin:${PATH}"
-RUN stack --resolver ghc-9.6.4 setup
+RUN stack --compiler ghc-9.4.7 setup
 
-RUN stack install omolu
+RUN stack install ormolu
 
 WORKDIR /peter-lang
 
