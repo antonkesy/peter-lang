@@ -1,0 +1,16 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: ormolu-formatter
+        name: ormolu-formatter
+        entry: bash -c "stack install ormolu && ormolu --mode inplace $(find . -name '*.hs')"
+        language: system
+        types: [haskell]
+        pass_filenames: false
+        always_run: true
