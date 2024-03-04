@@ -10,6 +10,11 @@ RUN curl -sSL https://get.haskellstack.org/ | sh
 ENV PATH="/root/.local/bin:${PATH}"
 RUN stack --compiler ghc-9.4.7 setup
 
+# pre-commit
+RUN apt-get -y install python3-pip
+RUN pip install pre-commit
+
+# formatter
 RUN stack install ormolu
 
 WORKDIR /peter-lang
