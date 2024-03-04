@@ -25,7 +25,15 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      AST
+      Parser.Comment
+      Parser.EndOfLine
+      Parser.Expression
+      Parser.Literal
+      Parser.Operator
+      Parser.Space
+      Parser.Type
+      Parser.Variable
   other-modules:
       Paths_peter
   hs-source-dirs:
@@ -58,7 +66,7 @@ test-suite peter-test
   main-is: Spec.hs
   other-modules:
       E2E.Placeholder
-      Unit.Placeholder
+      Unit.Parser.Comment
       Paths_peter
   hs-source-dirs:
       test
