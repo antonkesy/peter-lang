@@ -1,0 +1,70 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           peter
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/antonkesy/peter#readme>
+homepage:       https://github.com/antonkesy/peter#readme
+bug-reports:    https://github.com/antonkesy/peter/issues
+author:         Anton Kesy
+maintainer:     antonkesy@gmail.com
+copyright:      2024 Anton Kesy
+license:        Apache-2.0
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/antonkesy/peter
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_peter
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , optparse-applicative >=0.17.0
+    , parsec >=3.1.16 && <4
+    , prettyprinter >=1.7.1 && <2
+  default-language: Haskell2010
+
+executable peter-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_peter
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , optparse-applicative >=0.17.0
+    , parsec >=3.1.16 && <4
+    , peter
+    , prettyprinter >=1.7.1 && <2
+  default-language: Haskell2010
+
+test-suite peter-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_peter
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , optparse-applicative >=0.17.0
+    , parsec >=3.1.16 && <4
+    , peter
+    , prettyprinter >=1.7.1 && <2
+  default-language: Haskell2010
