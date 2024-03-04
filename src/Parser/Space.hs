@@ -1,9 +1,4 @@
-module Parser.Space
-  ( space',
-    spaces',
-    spaces1,
-  )
-where
+module Parser.Space (module Parser.Space) where
 
 import Control.Monad (void)
 import Parser.Comment (consumeComment)

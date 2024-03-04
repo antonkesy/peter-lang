@@ -1,10 +1,4 @@
-module Parser.Comment
-  ( parseComment,
-    parseSingleLineComment,
-    parseMultiLineComment,
-    consumeComment,
-  )
-where
+module Parser.Comment (module Parser.Comment) where
 
 import AST
 import Control.Monad (void)

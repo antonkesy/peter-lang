@@ -1,4 +1,4 @@
-module Parser.EndOfLine (eol) where
+module Parser.EndOfLine (module Parser.EndOfLine) where
 
 import Control.Monad (void)
 import Text.Parsec

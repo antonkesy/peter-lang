@@ -26,12 +26,15 @@ source-repository head
 library
   exposed-modules:
       AST
+      Parser.Assignment
       Parser.Comment
       Parser.EndOfLine
       Parser.Expression
       Parser.Literal
       Parser.Operator
+      Parser.Program
       Parser.Space
+      Parser.Statement
       Parser.Type
       Parser.Variable
   other-modules:
