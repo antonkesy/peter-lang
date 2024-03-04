@@ -6,6 +6,14 @@ Useless and barely functional toy programming language written in Haskell
 
 `stack test`
 
+## Formatting
+
+[ormolu](https://github.com/tweag/ormolu)
+
+```
+ormolu --mode inplace $(find . -name '*.hs')
+```
+
 ## CI
 
 `docker build .`
