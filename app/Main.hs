@@ -1,11 +1,12 @@
 module Main (main) where
 
+import Interpreter.Interpreter
 import Parser.Program
 import Text.Parsec (parse)
 
 developProgram :: String
 developProgram =
-  "int i = 1; int j = 2; int k = i + j;"
+  "int i = 1; int j = 2; int l = 3 + 4; int k = i + j + l;"
 
 main :: IO ()
 main = do
@@ -15,3 +16,4 @@ main = do
     Right program -> do
       putStrLn "Parsed program:"
       print program
+      interpret program
