@@ -60,4 +60,9 @@ interpretLiteral UnitLiteral = do
 interpretOperation :: Operator -> Value -> Value -> Value
 interpretOperation Plus (IntValue left) (IntValue right) = IntValue $ left + right
 interpretOperation Plus (FloatValue left) (FloatValue right) = FloatValue $ left + right
+interpretOperation Minus (IntValue left) (IntValue right) = IntValue $ left - right
+interpretOperation Minus (FloatValue left) (FloatValue right) = FloatValue $ left - right
+interpretOperation Multiply (IntValue left) (IntValue right) = IntValue $ left * right
+interpretOperation Multiply (FloatValue left) (FloatValue right) = FloatValue $ left * right
+interpretOperation Divide (IntValue left) (IntValue right) = IntValue $ left `div` right
 interpretOperation operator left right = error $ "Unsupported operation: " ++ show operator ++ " " ++ show left ++ " " ++ show right

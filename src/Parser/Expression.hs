@@ -20,8 +20,7 @@ parseOperation =
     _ <- spaces'
     op <- parseOperator
     _ <- spaces'
-    right <- parseExpression
-    return $ OperationExpression left op right
+    OperationExpression left op <$> parseExpression
 
 parseAtomic :: Parser Expression
 parseAtomic = do

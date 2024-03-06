@@ -6,7 +6,8 @@ import Text.Parsec (parse)
 
 developProgram :: String
 developProgram =
-  "int i = 1; int j = 2; int l = 3 + 4; int k = i + j + l;"
+  -- "int i = 1; int j = 2; int l = 3 + 4; int k = i + j + l;"
+  "int i = 1; int j = 2; int l = 3 + 4; int k = i + j + l; k = k * 0;"
 
 main :: IO ()
 main = do

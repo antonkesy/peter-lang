@@ -14,5 +14,4 @@ parseAssignment =
     _ <- spaces'
     _ <- char '='
     _ <- spaces'
-    expr <- parseExpression
-    return (Assignment var expr)
+    Assignment var <$> parseExpression

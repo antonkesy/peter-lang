@@ -72,7 +72,10 @@ test-suite peter-test
   main-is: Spec.hs
   other-modules:
       E2E.Placeholder
+      Unit.Parser.Assignment
       Unit.Parser.Comment
+      Unit.Parser.Expression
+      Unit.Parser.Statement
       Paths_peter
   hs-source-dirs:
       test

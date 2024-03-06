@@ -1,3 +1,5 @@
+{-# LANGUAGE GADTs #-}
+
 module AST (module AST) where
 
 type Name = String
@@ -32,7 +34,8 @@ data Statement = VariableStatement Variable | AssignmentStatement Assignment
 -- deriving (Show)
 
 -- data Program = Program {main :: Function, restFunctions :: [Function]}
-data Program = Program [Statement]
+data Program where
+  Program :: [Statement] -> Program
   deriving (Show, Eq)
 
 -- TODO: builtin: print, input
