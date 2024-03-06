@@ -11,8 +11,8 @@ import Text.Parsec.String
 
 parseStatement :: Parser Statement
 parseStatement =
-  ( (VariableStatement <$> (spaces' *> (try parseVariable)))
-      <|> (AssignmentStatement <$> (spaces' *> (try parseAssignment)))
+  ( (VariableStatement <$> try (spaces' *> (try parseVariable)))
+      <|> (AssignmentStatement <$> try (spaces' *> (try parseAssignment)))
   )
     <* endOfStatement
 

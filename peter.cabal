@@ -75,6 +75,7 @@ test-suite peter-test
       Unit.Parser.Assignment
       Unit.Parser.Comment
       Unit.Parser.Expression
+      Unit.Parser.Program
       Unit.Parser.Statement
       Paths_peter
   hs-source-dirs:
