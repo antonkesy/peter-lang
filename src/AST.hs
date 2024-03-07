@@ -37,4 +37,5 @@ data Function = Function Name [VariableDeclaration] Type [Statement]
 data Program = Program [Statement]
   deriving (Show, Eq)
 
--- TODO: builtin: print, input
+data BuiltInFuction = Print | Input
+  deriving (Show, Eq)

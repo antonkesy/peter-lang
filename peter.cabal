@@ -29,6 +29,7 @@ library
       Interpreter.Interpreter
       Interpreter.Validator
       Parser.Assignment
+      Parser.Atomic
       Parser.Comment
       Parser.EndOfLine
       Parser.Expression
