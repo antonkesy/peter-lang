@@ -10,6 +10,7 @@ parseLiteral =
     <|> try parseBoolLiteral
     <|> try parseFloatLiteral
     <|> try parseIntLiteral
+    <|> try praseStringLiteral
 
 parseIntLiteral :: Parser Literal
 parseIntLiteral = do
@@ -36,3 +37,10 @@ parseBoolLiteral =
 
 parseUnitLiteral :: Parser Literal
 parseUnitLiteral = string "()" >> return UnitLiteral
+
+praseStringLiteral :: Parser Literal
+praseStringLiteral = do
+  _ <- char '"'
+  s <- many (noneOf "\"")
+  _ <- char '"'
+  return $ StringLiteral s

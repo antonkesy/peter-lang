@@ -1,7 +1,7 @@
 module Parser.Expression (module Parser.Expression) where
 
 import AST
-import Parser.Atomic
+-- import Parser.Atomic
 import Parser.Literal (parseLiteral)
 import Parser.Operator (parseOperator)
 import Parser.Space
@@ -26,3 +26,17 @@ parseOperation =
 parseAtomicExpression :: Parser Expression
 parseAtomicExpression = do
   AtomicExpression <$> try parseAtomic
+
+parseFunctionCallAtomic :: Parser Atomic
+parseFunctionCallAtomic = do
+  name <- try parseVariableName
+  _ <- char '('
+  args <- try (parseExpression `sepBy` (spaces' >> char ',' >> spaces'))
+  _ <- char ')'
+  return $ FunctionCallAtomic name args
+
+parseAtomic :: Parser Atomic
+parseAtomic =
+  (LiteralAtomic <$> try parseLiteral)
+    <|> try parseFunctionCallAtomic
+    <|> (VariableAtomic <$> try parseVariableName)

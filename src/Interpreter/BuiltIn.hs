@@ -2,13 +2,9 @@ module Interpreter.BuiltIn (module Interpreter.BuiltIn) where
 
 import AST
 import Data.Map.Strict as Map
+import Interpreter.ProgramState
 
--- import Text.Parsec
--- import Text.Parsec.String
-
--- printBuiltIn :: Parser Statement
-
-data BuiltIn = BuiltIn Name [Type] Type ([Type] -> IO Type)
+data BuiltIn = BuiltIn Name Type ([Value] -> IO Value)
 
 getAllBuiltIns :: Map String BuiltIn
 getAllBuiltIns = Map.fromList [("print", printBuiltIn)]
@@ -17,9 +13,10 @@ printBuiltIn :: BuiltIn
 printBuiltIn =
   BuiltIn
     "print"
-    [CustomType "String"]
     UnitType
-    ( \[CustomType "String"] -> do
-        putStrLn "Hello, World!\n"
-        pure UnitType
+    ( \val -> do
+        case val of
+          [(StringValue s)] -> putStrLn s
+          _ -> error "Not a single string"
+        pure UnitValue
     )

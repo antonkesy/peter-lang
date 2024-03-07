@@ -10,6 +10,7 @@ parseType =
     <|> (string "int" >> return IntType)
     <|> (string "float" >> return FloatType)
     <|> (string "bool" >> return BoolType)
+    <|> (string "str" >> return StringType)
     <|> (CustomType <$> parseVariableName)
 
 parseVariableName :: Parser Name

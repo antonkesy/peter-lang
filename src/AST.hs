@@ -5,10 +5,10 @@ type Name = String
 data Operator = Plus | Minus | Multiply | Divide | Modulus | And | Or | Not | Eq | Neq | Lt | Gt | Le | Ge
   deriving (Show, Eq)
 
-data Literal = IntLiteral Int | FloatLiteral Float | BoolLiteral Bool | UnitLiteral
+data Literal = IntLiteral Int | FloatLiteral Float | BoolLiteral Bool | UnitLiteral | StringLiteral String
   deriving (Show, Eq)
 
-data Atomic = LiteralAtomic Literal | VariableAtomic Name | FunctionCallAtomic Name [Atomic]
+data Atomic = LiteralAtomic Literal | VariableAtomic Name | FunctionCallAtomic Name [Expression]
   deriving (Show, Eq)
 
 data Expression = OperationExpression Expression Operator Expression | AtomicExpression Atomic
@@ -25,7 +25,7 @@ data Assignment = Assignment Name Expression
 
 type Comment = String
 
-data Type = IntType | FloatType | BoolType | UnitType | CustomType Name
+data Type = IntType | FloatType | BoolType | UnitType | CustomType Name | StringType
   deriving (Show, Eq)
 
 data Statement = VariableStatement Variable | AssignmentStatement Assignment | FunctionDefinitionStatement Function | ExpressionStatement Expression

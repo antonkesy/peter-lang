@@ -9,7 +9,7 @@ developProgram =
   -- "int i = 1; int j = 2; int l = 3 + 4; int k = i + j + l; k = k * 0;"
   -- "void test(int i, int k) { }"
   -- "print()"
-  "int main() { print(); }"
+  "int main() { print(\"Test\"); }"
 
 main :: IO ()
 main = do

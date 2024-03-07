@@ -1,19 +1,11 @@
-{-# LANGUAGE GADTs #-}
-
 module Interpreter.Interpreter (module Interpreter.Interpreter) where
 
 import AST
 import Control.Monad (foldM)
 import Data.Map.Strict as Map
 import Interpreter.BuiltIn
+import Interpreter.ProgramState
 import Interpreter.Validator
-
-data Value = IntValue Int | FloatValue Float | BoolValue Bool | UnitValue
-  deriving (Show)
-
-data ProgramState where
-  ProgramState :: {variables :: Map Name Value, functions :: Map Name Statement} -> ProgramState
-  deriving (Show)
 
 interpret :: Program -> IO ()
 interpret (Program statements) = do
@@ -69,11 +61,12 @@ interpretAtomic (ProgramState vars _) (VariableAtomic name) = do
   return $ case varValue of
     Just value -> value
     Nothing -> error $ "Variable not found: " ++ name
-interpretAtomic (ProgramState vars funs) (FunctionCallAtomic name _args) = do
+interpretAtomic (ProgramState vars funs) (FunctionCallAtomic name args) = do
   let isBuiltIn = Map.lookup name getAllBuiltIns
   case isBuiltIn of
-    Just (BuiltIn _ args outputType fn) -> do
-      _ <- fn args
+    Just (BuiltIn _ outputType fn) -> do
+      argValues <- mapM (\a -> interpretExpression (ProgramState vars funs) a) args
+      _ <- fn argValues
       return UnitValue
     Nothing -> do
       let fun = Map.lookup name funs
@@ -92,6 +85,8 @@ interpretLiteral (BoolLiteral value) = do
   return $ BoolValue value
 interpretLiteral UnitLiteral = do
   return UnitValue
+interpretLiteral (StringLiteral value) = do
+  return $ StringValue value
 
 interpretOperation :: Operator -> Value -> Value -> Value
 interpretOperation Plus (IntValue left) (IntValue right) = IntValue $ left + right
