@@ -12,15 +12,16 @@ interpret (Program statements) = do
   isValid <- validate (Program statements)
   if isValid
     then do
-      putStrLn "Valid program"
-      endState <- foldM interpretStatement (ProgramState empty allFunctions) (addMainFunctionCall ++ statements)
-      putStrLn $ "End state: " ++ show endState
+      -- putStrLn "Valid program"
+      _ <- foldM interpretStatement (ProgramState empty allFunctions) (addMainFunctionCall ++ statements)
+      -- putStrLn $ "End state: " ++ show endState
+      return ()
     else do
       putStrLn "Invalid program"
   where
     addMainFunctionCall = if hasMainFunction then mainFunctionCall else []
     mainFunctionCall = [ExpressionStatement (AtomicExpression (FunctionCallAtomic "main" []))]
-    hasMainFunction = Prelude.filter isMainFunction statements /= []
+    hasMainFunction = any isMainFunction statements
     isMainFunction (FunctionDefinitionStatement (Function "main" _ _ _)) = True
     isMainFunction _ = False
     isFunctionDefinition (FunctionDefinitionStatement _) = True

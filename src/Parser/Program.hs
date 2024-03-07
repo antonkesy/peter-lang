@@ -9,5 +9,6 @@ import Text.Parsec.String
 parseProgram :: Parser Program
 parseProgram = do
   statements <- many (try parseStatement)
-  _ <- eof
+  -- _ <- eof -- TODO: ensure no tokens left -> EOF not working becuase already consumed
+  _ <- optional eof
   return $ Program statements

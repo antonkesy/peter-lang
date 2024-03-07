@@ -2,7 +2,8 @@ module Unit.Parser.Atomic (allTests) where
 
 import AST
 import Data.Either (fromRight, isRight)
-import Parser.Atomic
+-- import Parser.Atomic
+import Parser.Expression
 import Test.HUnit
 import Text.Parsec (parse)
 

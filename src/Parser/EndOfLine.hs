@@ -5,4 +5,4 @@ import Text.Parsec
 import Text.Parsec.String
 
 eol :: Parser ()
-eol = void (char '\n') <|> eof
+eol = void endOfLine <|> eof

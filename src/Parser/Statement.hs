@@ -18,7 +18,7 @@ parseStatement =
       <|> (FunctionDefinitionStatement <$> try (spaces' *> try parseFunction))
       <|> ExpressionStatement <$> try (spaces' *> try parseExpression)
   )
-    <* spaces
+    <* spaces'
     <* endOfStatement
 
 endOfStatement :: Parser ()
