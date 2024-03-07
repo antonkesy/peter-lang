@@ -20,6 +20,6 @@ printBuiltIn =
     [CustomType "String"]
     UnitType
     ( \[CustomType "String"] -> do
-        putStrLn "Hello, World!"
+        putStrLn "Hello, World!\n"
         pure UnitType
     )

@@ -28,7 +28,9 @@ interpret (Program statements) = do
   where
     addMainFunctionCall = if hasMainFunction then mainFunctionCall else []
     mainFunctionCall = [ExpressionStatement (AtomicExpression (FunctionCallAtomic "main" []))]
-    hasMainFunction = False
+    hasMainFunction = Prelude.filter isMainFunction statements /= []
+    isMainFunction (FunctionDefinitionStatement (Function "main" _ _ _)) = True
+    isMainFunction _ = False
     isFunctionDefinition (FunctionDefinitionStatement _) = True
     isFunctionDefinition _ = False
     getFunctionName (FunctionDefinitionStatement (Function name _ _ _)) = name
