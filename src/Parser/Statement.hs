@@ -4,6 +4,7 @@ import AST
 import Control.Monad (void)
 import Parser.Assignment
 import Parser.EndOfLine
+import Parser.Expression
 import Parser.Space
 import Parser.Type
 import Parser.Variable
@@ -15,6 +16,7 @@ parseStatement =
   ( (VariableStatement <$> try (spaces' *> try parseVariable))
       <|> (AssignmentStatement <$> try (spaces' *> try parseAssignment))
       <|> (FunctionDefinitionStatement <$> try (spaces' *> try parseFunction))
+      <|> ExpressionStatement <$> try (spaces' *> try parseExpression)
   )
     <* spaces
     <* endOfStatement

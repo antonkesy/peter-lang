@@ -21,7 +21,7 @@ testSimple = TestCase $ do
     True
     (isRight (parse parseProgram "" ""))
   assertEqual
-    "Single variable statement"
+    "int k = 1;"
     ( Program
         [ VariableStatement
             ( Variable
@@ -33,7 +33,7 @@ testSimple = TestCase $ do
     )
     (fromRight emptyProgram (parse parseProgram "" "int k = 1;"))
   assertEqual
-    "Multiple variable statements"
+    "int k = 1; int j = 2;"
     ( Program
         [ VariableStatement
             ( Variable
@@ -51,7 +51,7 @@ testSimple = TestCase $ do
     )
     (fromRight emptyProgram (parse parseProgram "" "int k = 1; int j = 2;"))
   assertEqual
-    "Single assignment statement"
+    "k = 1;"
     ( Program
         [ AssignmentStatement
             ( Assignment
@@ -63,7 +63,7 @@ testSimple = TestCase $ do
     )
     (fromRight emptyProgram (parse parseProgram "" "k = 1;"))
   assertEqual
-    "variable statement and assignment statement"
+    "int k = 1; j = 2;"
     ( Program
         [ VariableStatement
             ( Variable
@@ -80,3 +80,11 @@ testSimple = TestCase $ do
         ]
     )
     (fromRight emptyProgram (parse parseProgram "" "int k = 1; j = 2;"))
+  assertEqual
+    "print();"
+    ( Program
+        [ ExpressionStatement
+            (AtomicExpression (FunctionCallAtomic "print" []))
+        ]
+    )
+    (fromRight emptyProgram (parse parseProgram "" "print();"))

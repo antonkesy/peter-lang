@@ -27,15 +27,15 @@ testSimple = TestCase $ do
     False
     (isRight (parse parseStatement "" ""))
   assertEqual
-    "var defintion"
+    "int i = 1;"
     (VariableStatement (Variable (VariableDeclaration "i" IntType) (AtomicExpression (LiteralAtomic (IntLiteral 1)))))
     (fromRight emptyTestStatement (parse parseStatement "" "int i = 1;"))
   assertEqual
-    "var assignment literal number"
+    "k = 2;"
     (AssignmentStatement (Assignment "k" (AtomicExpression (LiteralAtomic (IntLiteral 2)))))
     (fromRight emptyTestStatement (parse parseStatement "" "k = 2;"))
   assertEqual
-    "var assignment with var and number"
+    "k = k * 1;"
     ( AssignmentStatement
         ( Assignment
             "k"
@@ -47,6 +47,10 @@ testSimple = TestCase $ do
         )
     )
     (fromRight emptyTestStatement (parse parseStatement "" "k = k * 1;"))
+  assertEqual
+    "print();"
+    (ExpressionStatement (AtomicExpression (FunctionCallAtomic "print" [])))
+    (fromRight emptyTestStatement (parse parseStatement "" "print();"))
 
 emptyTestFunction :: Function
 emptyTestFunction = Function "TEST" [] IntType []
@@ -58,11 +62,11 @@ testFunctions = TestCase $ do
     False
     (isRight (parse parseFunction "" ""))
   assertEqual
-    "empty main function"
+    "void main() { }"
     (Function "main" [] UnitType [])
     (fromRight emptyTestFunction (parse parseFunction "" "void main() { }"))
   assertEqual
-    "main function"
+    "void main() { int i = 1; i = 2; }"
     ( Function
         "main"
         []
@@ -73,7 +77,7 @@ testFunctions = TestCase $ do
     )
     (fromRight emptyTestFunction (parse parseFunction "" "void main() { int i = 1; i = 2; }"))
   assertEqual
-    "function with arguments"
+    "float test(int i, int k) { }"
     ( (Function "test" [VariableDeclaration "i" IntType, VariableDeclaration "k" IntType] FloatType [])
     )
     (fromRight emptyTestFunction (parse parseFunction "" "float test(int i, int k) { }"))

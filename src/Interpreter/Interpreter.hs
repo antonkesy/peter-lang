@@ -5,6 +5,7 @@ module Interpreter.Interpreter (module Interpreter.Interpreter) where
 import AST
 import Control.Monad (foldM)
 import Data.Map.Strict as Map
+import Interpreter.BuiltIn
 import Interpreter.Validator
 
 data Value = IntValue Int | FloatValue Float | BoolValue Bool | UnitValue
@@ -67,12 +68,18 @@ interpretAtomic (ProgramState vars _) (VariableAtomic name) = do
     Just value -> value
     Nothing -> error $ "Variable not found: " ++ name
 interpretAtomic (ProgramState vars funs) (FunctionCallAtomic name _args) = do
-  let fun = Map.lookup name funs
-  case fun of
-    Just (FunctionDefinitionStatement (Function _ _ _ body)) -> do
-      _ <- foldM interpretStatement (ProgramState vars funs) body
-      return UnitValue -- TODO: add return values
-    Nothing -> error $ "Function not found: " ++ name
+  let isBuiltIn = Map.lookup name getAllBuiltIns
+  case isBuiltIn of
+    Just (BuiltIn _ args outputType fn) -> do
+      _ <- fn args
+      return UnitValue
+    Nothing -> do
+      let fun = Map.lookup name funs
+      case fun of
+        Just (FunctionDefinitionStatement (Function _ _ _ body)) -> do
+          _ <- foldM interpretStatement (ProgramState vars funs) body
+          return UnitValue -- TODO: add return values
+        Nothing -> error $ "Function not found: " ++ name
 
 interpretLiteral :: Literal -> IO Value
 interpretLiteral (IntLiteral value) = do

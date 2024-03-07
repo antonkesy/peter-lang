@@ -9,16 +9,14 @@ import Text.Parsec.String
 
 parseAtomic :: Parser Atomic
 parseAtomic =
-  LiteralAtomic
-    <$> parseLiteral
-    <|> VariableAtomic
-      <$> parseVariableName
-    <|> parseFunctionCallAtomic
+  (LiteralAtomic <$> try parseLiteral)
+    <|> try parseFunctionCallAtomic
+    <|> (VariableAtomic <$> try parseVariableName)
 
 parseFunctionCallAtomic :: Parser Atomic
 parseFunctionCallAtomic = do
-  name <- parseVariableName
+  name <- try parseVariableName
   _ <- char '('
-  args <- parseAtomic `sepBy` (spaces' >> char ',' >> spaces')
+  args <- try (parseAtomic `sepBy` (spaces' >> char ',' >> spaces'))
   _ <- char ')'
   return $ FunctionCallAtomic name args

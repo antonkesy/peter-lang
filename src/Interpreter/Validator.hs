@@ -32,3 +32,5 @@ hasEntryPoint (Program statements) =
     isGlobalStatement (AssignmentStatement _) = True
     isGlobalStatement (ExpressionStatement _) = True
     isGlobalStatement _ = False
+
+-- TODO: check no name clash with built-in functions

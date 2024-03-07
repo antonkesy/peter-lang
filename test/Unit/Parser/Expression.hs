@@ -24,3 +24,7 @@ testSimple = TestCase $ do
     "Single Number"
     (AtomicExpression (LiteralAtomic (IntLiteral 1)))
     (fromRight emptyTestExpression (parse parseExpression "" "1"))
+  assertEqual
+    "Function Call"
+    (AtomicExpression (FunctionCallAtomic "print" []))
+    (fromRight emptyTestExpression (parse parseExpression "" "print()"))
