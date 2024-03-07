@@ -27,6 +27,7 @@ library
   exposed-modules:
       AST
       Interpreter.Interpreter
+      Interpreter.Validator
       Parser.Assignment
       Parser.Comment
       Parser.EndOfLine

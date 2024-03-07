@@ -1,5 +1,3 @@
-{-# LANGUAGE GADTs #-}
-
 module AST (module AST) where
 
 type Name = String
@@ -10,13 +8,16 @@ data Operator = Plus | Minus | Multiply | Divide | Modulus | And | Or | Not | Eq
 data Literal = IntLiteral Int | FloatLiteral Float | BoolLiteral Bool | UnitLiteral
   deriving (Show, Eq)
 
-data Atomic = LiteralAtomic Literal | VariableAtomic Name
+data Atomic = LiteralAtomic Literal | VariableAtomic Name | FunctionCallAtomic Name [Atomic]
   deriving (Show, Eq)
 
 data Expression = OperationExpression Expression Operator Expression | AtomicExpression Atomic
   deriving (Show, Eq)
 
-data Variable = Variable Name Type Expression
+data VariableDeclaration = VariableDeclaration Name Type
+  deriving (Show, Eq)
+
+data Variable = Variable VariableDeclaration Expression
   deriving (Show, Eq)
 
 data Assignment = Assignment Name Expression
@@ -27,15 +28,13 @@ type Comment = String
 data Type = IntType | FloatType | BoolType | UnitType | CustomType Name
   deriving (Show, Eq)
 
-data Statement = VariableStatement Variable | AssignmentStatement Assignment
+data Statement = VariableStatement Variable | AssignmentStatement Assignment | FunctionDefinitionStatement Function | ExpressionStatement Expression
   deriving (Show, Eq)
 
--- data Function = Function Name [Variable] Type [Statement]
--- deriving (Show)
+data Function = Function Name [VariableDeclaration] Type [Statement]
+  deriving (Show, Eq)
 
--- data Program = Program {main :: Function, restFunctions :: [Function]}
-data Program where
-  Program :: [Statement] -> Program
+data Program = Program [Statement]
   deriving (Show, Eq)
 
 -- TODO: builtin: print, input

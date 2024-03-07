@@ -25,8 +25,7 @@ testSimple = TestCase $ do
     ( Program
         [ VariableStatement
             ( Variable
-                "k"
-                IntType
+                (VariableDeclaration "k" IntType)
                 ( AtomicExpression (LiteralAtomic (IntLiteral 1))
                 )
             )
@@ -38,15 +37,13 @@ testSimple = TestCase $ do
     ( Program
         [ VariableStatement
             ( Variable
-                "k"
-                IntType
+                (VariableDeclaration "k" IntType)
                 ( AtomicExpression (LiteralAtomic (IntLiteral 1))
                 )
             ),
           VariableStatement
             ( Variable
-                "j"
-                IntType
+                (VariableDeclaration "j" IntType)
                 ( AtomicExpression (LiteralAtomic (IntLiteral 2))
                 )
             )
@@ -70,8 +67,7 @@ testSimple = TestCase $ do
     ( Program
         [ VariableStatement
             ( Variable
-                "k"
-                IntType
+                (VariableDeclaration "k" IntType)
                 ( AtomicExpression (LiteralAtomic (IntLiteral 1))
                 )
             ),

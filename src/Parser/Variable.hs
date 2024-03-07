@@ -7,13 +7,17 @@ import Parser.Type
 import Text.Parsec
 import Text.Parsec.String
 
-parseVariable :: Parser Variable
-parseVariable = do
+parseVariableDeclaration :: Parser VariableDeclaration
+parseVariableDeclaration = do
   varType <- parseType
   _ <- spaces'
   name <- parseVariableName
+  return $ VariableDeclaration name varType
+
+parseVariable :: Parser Variable
+parseVariable = do
+  decl <- parseVariableDeclaration
   _ <- spaces'
   _ <- char '='
   _ <- spaces'
-  expr <- parseExpression
-  return $ Variable name varType expr
+  Variable decl <$> parseExpression

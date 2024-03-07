@@ -12,7 +12,7 @@ allTests =
   ]
 
 emptyTestAssignment :: Assignment
-emptyTestAssignment = (Assignment "test" (AtomicExpression (LiteralAtomic (IntLiteral 0))))
+emptyTestAssignment = Assignment "test" (AtomicExpression (LiteralAtomic (IntLiteral 0)))
 
 testSimple :: Test
 testSimple = TestCase $ do

@@ -7,4 +7,7 @@ import Text.Parsec.String
 
 -- TODO: rename to File
 parseProgram :: Parser Program
-parseProgram = Program <$> (many parseStatement) <* eof
+parseProgram = do
+  statements <- many (try parseStatement)
+  _ <- eof
+  return $ Program statements
