@@ -65,10 +65,9 @@ interpretAtomic (ProgramState vars _) (VariableAtomic name) = do
 interpretAtomic (ProgramState vars funs) (FunctionCallAtomic name args) = do
   let isBuiltIn = Map.lookup name getAllBuiltIns
   case isBuiltIn of
-    Just (BuiltIn _ outputType fn) -> do
-      argValues <- mapM (\a -> interpretExpression (ProgramState vars funs) a) args
-      _ <- fn argValues
-      return UnitValue
+    Just (BuiltIn _ _ fn) -> do
+      argValues <- mapM (interpretExpression (ProgramState vars funs)) args
+      fn argValues
     Nothing -> do
       let fun = Map.lookup name funs
       case fun of

@@ -1,22 +1,46 @@
-module Interpreter.BuiltIn (module Interpreter.BuiltIn) where
+module Interpreter.BuiltIn (getAllBuiltIns, BuiltIn (..)) where
 
 import AST
 import Data.Map.Strict as Map
+import qualified Data.Text as T
 import Interpreter.ProgramState
 
 data BuiltIn = BuiltIn Name Type ([Value] -> IO Value)
 
 getAllBuiltIns :: Map String BuiltIn
-getAllBuiltIns = Map.fromList [("print", printBuiltIn)]
+getAllBuiltIns = Map.fromList [("print", Interpreter.BuiltIn.print), ("str", toString)]
 
-printBuiltIn :: BuiltIn
-printBuiltIn =
+print :: BuiltIn
+print =
   BuiltIn
     "print"
     UnitType
     ( \val -> do
         case val of
-          [(StringValue s)] -> putStrLn s
+          [StringValue s] -> putStr (replaceEscaped s)
           _ -> error "Not a single string"
         pure UnitValue
     )
+  where
+    replaceEscaped :: String -> String
+    replaceEscaped s =
+      T.unpack (replaceEscaped' ("\\n", "\n") (T.pack s))
+      where
+        replaceEscaped' (x, y) = T.replace (T.pack x) (T.pack y)
+
+toString :: BuiltIn
+toString =
+  BuiltIn
+    "str"
+    StringType
+    ( \val -> do
+        pure (StringValue (valueToString val))
+    )
+  where
+    valueToString :: [Value] -> String
+    valueToString val = case val of
+      [StringValue s] -> s
+      [IntValue i] -> show i
+      [FloatValue f] -> show f
+      [BoolValue b] -> show b
+      _ -> error "No matching type for str"

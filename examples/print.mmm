@@ -1,0 +1,6 @@
+void main() {
+  print("Hello, World!\n");
+
+  int a = 1;
+  print(str(a));
+}
