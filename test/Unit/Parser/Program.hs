@@ -88,3 +88,40 @@ testSimple = TestCase $ do
         ]
     )
     (fromRight emptyProgram (parse parseProgram "" "print();"))
+  assertEqual
+    "function calls around function"
+    ( Program
+        [ ExpressionStatement
+            (AtomicExpression (FunctionCallAtomic "test" [])),
+          FunctionDefinitionStatement
+            ( Function
+                "test"
+                []
+                UnitType
+                [ ExpressionStatement
+                    ( AtomicExpression
+                        ( FunctionCallAtomic
+                            "print"
+                            [AtomicExpression (LiteralAtomic (StringLiteral "Hello, World!"))]
+                        )
+                    )
+                ]
+            ),
+          ExpressionStatement (AtomicExpression (FunctionCallAtomic "test" [])),
+          ExpressionStatement (AtomicExpression (FunctionCallAtomic "test" []))
+        ]
+    )
+    ( fromRight
+        emptyProgram
+        ( parse
+            parseProgram
+            ""
+            "test();\n\
+            \void test() {\n\
+            \  print(\"Hello, World!\");\n\
+            \}\n\
+            \\n\
+            \test();\n\
+            \test();"
+        )
+    )

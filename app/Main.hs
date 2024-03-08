@@ -29,6 +29,7 @@ main = do
 processOptions :: Options -> IO ()
 processOptions (Options Nothing (Just path)) = do
   contents <- readFile path
+  -- putStrLn contents
   runPeter contents
 processOptions (Options (Just inlineSourceCode) Nothing) =
   runPeter inlineSourceCode
@@ -42,5 +43,5 @@ runPeter sourceCode = do
     Left err -> putStrLn $ "Parse error: " ++ show err
     Right program -> do
       -- putStrLn "Parsed program:"
-      print program
+      -- print program
       interpret program

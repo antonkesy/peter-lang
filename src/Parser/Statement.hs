@@ -13,13 +13,10 @@ import Text.Parsec.String
 
 parseStatement :: Parser Statement
 parseStatement =
-  ( (VariableStatement <$> try (spaces' *> try parseVariable))
-      <|> (AssignmentStatement <$> try (spaces' *> try parseAssignment))
-      <|> (FunctionDefinitionStatement <$> try (spaces' *> try parseFunction))
-      <|> ExpressionStatement <$> try (spaces' *> try parseExpression)
-  )
-    <* spaces'
-    <* endOfStatement
+  (VariableStatement <$> try (spaces' *> try parseVariable) <* endOfStatement)
+    <|> (AssignmentStatement <$> try (spaces' *> try parseAssignment) <* endOfStatement)
+    <|> (FunctionDefinitionStatement <$> try (spaces' *> try parseFunction))
+    <|> ExpressionStatement <$> try (spaces' *> try parseExpression) <* endOfStatement
 
 endOfStatement :: Parser ()
 endOfStatement = void (char ';') <|> eol
