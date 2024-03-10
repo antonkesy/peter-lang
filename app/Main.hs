@@ -5,7 +5,6 @@ import Options.Applicative
 import Parser.Program
 import Text.Parsec (parse)
 
--- TODO: replace with either
 data Options = Options (Maybe String) (Maybe FilePath)
 
 parseOptions :: Parser Options
@@ -43,5 +42,5 @@ runPeter sourceCode = do
     Left err -> putStrLn $ "Parse error: " ++ show err
     Right program -> do
       -- putStrLn "Parsed program:"
-      print program
+      -- print program
       interpret program

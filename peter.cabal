@@ -28,6 +28,7 @@ library
       AST
       Interpreter.BuiltIn
       Interpreter.Interpreter
+      Interpreter.Manipulator
       Interpreter.ProgramState
       Interpreter.Validator
       Parser.Assignment
@@ -36,6 +37,7 @@ library
       Parser.EndOfLine
       Parser.Expression
       Parser.Literal
+      Parser.Name
       Parser.Operator
       Parser.Program
       Parser.Space

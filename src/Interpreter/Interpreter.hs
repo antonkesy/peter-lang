@@ -4,6 +4,7 @@ import AST
 import Control.Monad (foldM)
 import Data.Map.Strict as Map
 import Interpreter.BuiltIn
+import Interpreter.Manipulator
 import Interpreter.ProgramState
 import Interpreter.Validator
 
@@ -13,34 +14,29 @@ interpret (Program statements) = do
   if isValid
     then do
       -- putStrLn "Valid program"
-      _ <- foldM interpretStatement (ProgramState empty allFunctions) (addMainFunctionCall ++ statements)
+      let correctedStatments = ensureEntryPoint statements
+      let functionMap = getFunctionMap correctedStatments
+      _ <- foldM interpretStatement (InterpretState (ProgramState empty functionMap) Nothing) correctedStatments
       -- putStrLn $ "End state: " ++ show endState
       return ()
     else do
       putStrLn "Invalid program"
-  where
-    addMainFunctionCall = if hasMainFunction then mainFunctionCall else []
-    mainFunctionCall = [ExpressionStatement (AtomicExpression (FunctionCallAtomic "main" []))]
-    hasMainFunction = any isMainFunction statements
-    isMainFunction (FunctionDefinitionStatement (Function "main" _ _ _)) = True
-    isMainFunction _ = False
-    isFunctionDefinition (FunctionDefinitionStatement _) = True
-    isFunctionDefinition _ = False
-    getFunctionName (FunctionDefinitionStatement (Function name _ _ _)) = name
-    allFunctions = Map.fromList $ Prelude.map (\item -> (getFunctionName item, item)) (Prelude.filter isFunctionDefinition statements)
 
-interpretStatement :: ProgramState -> Statement -> IO ProgramState
-interpretStatement state (VariableStatement (Variable (VariableDeclaration name _) expression)) = do
+interpretStatement :: InterpretState -> Statement -> IO InterpretState
+interpretStatement (InterpretState state _) (VariableStatement (Variable (VariableDeclaration name _) expression)) = do
   value <- interpretExpression state expression
-  return (updateState state name value)
-interpretStatement state (AssignmentStatement (Assignment name expression)) = do
+  return (InterpretState (updateState state name value) Nothing)
+interpretStatement (InterpretState state _) (AssignmentStatement (Assignment name expression)) = do
   value <- interpretExpression state expression
-  return (updateState state name value)
-interpretStatement state (ExpressionStatement expression) = do
+  return (InterpretState (updateState state name value) Nothing)
+interpretStatement (InterpretState state _) (ExpressionStatement expression) = do
   _ <- interpretExpression state expression
-  return state
-interpretStatement state (FunctionDefinitionStatement _) = do
-  return state
+  return (InterpretState state Nothing)
+interpretStatement (InterpretState state _) (FunctionDefinitionStatement _) = do
+  return (InterpretState state Nothing)
+interpretStatement (InterpretState state _) (ReturnStatement expression) = do
+  ret <- interpretExpression state expression
+  return (InterpretState state (Just ret))
 
 updateState :: ProgramState -> Name -> Value -> ProgramState
 updateState (ProgramState vars funs) name value = ProgramState (Map.insert name value vars) funs
@@ -72,8 +68,10 @@ interpretAtomic (ProgramState vars funs) (FunctionCallAtomic name args) = do
       let fun = Map.lookup name funs
       case fun of
         Just (FunctionDefinitionStatement (Function _ _ _ body)) -> do
-          _ <- foldM interpretStatement (ProgramState vars funs) body
-          return UnitValue -- TODO: add return values
+          (InterpretState _ ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) body
+          case ret of
+            Just value -> return value
+            Nothing -> error $ "Function did not return a value: " ++ name
         Nothing -> error $ "Function not found: " ++ name
 
 interpretLiteral :: Literal -> IO Value

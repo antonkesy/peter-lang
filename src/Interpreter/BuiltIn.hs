@@ -8,7 +8,7 @@ import Interpreter.ProgramState
 data BuiltIn = BuiltIn Name Type ([Value] -> IO Value)
 
 getAllBuiltIns :: Map String BuiltIn
-getAllBuiltIns = Map.fromList [("print", Interpreter.BuiltIn.print), ("str", toString)]
+getAllBuiltIns = Map.fromList [("print", Interpreter.BuiltIn.print), ("println", printLn), ("str", toString)]
 
 print :: BuiltIn
 print =
@@ -18,6 +18,24 @@ print =
     ( \val -> do
         case val of
           [StringValue s] -> putStr (replaceEscaped s)
+          _ -> error "Not a single string"
+        pure UnitValue
+    )
+  where
+    replaceEscaped :: String -> String
+    replaceEscaped s =
+      T.unpack (replaceEscaped' ("\\n", "\n") (T.pack s))
+      where
+        replaceEscaped' (x, y) = T.replace (T.pack x) (T.pack y)
+
+printLn :: BuiltIn
+printLn =
+  BuiltIn
+    "println"
+    UnitType
+    ( \val -> do
+        case val of
+          [StringValue s] -> putStrLn (replaceEscaped s)
           _ -> error "Not a single string"
         pure UnitValue
     )

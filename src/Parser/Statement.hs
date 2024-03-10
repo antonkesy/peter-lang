@@ -5,6 +5,7 @@ import Control.Monad (void)
 import Parser.Assignment
 import Parser.EndOfLine
 import Parser.Expression
+import Parser.Name
 import Parser.Space
 import Parser.Type
 import Parser.Variable
@@ -13,10 +14,21 @@ import Text.Parsec.String
 
 parseStatement :: Parser Statement
 parseStatement =
-  (VariableStatement <$> try (spaces' *> try parseVariable) <* endOfStatement)
-    <|> (AssignmentStatement <$> try (spaces' *> try parseAssignment) <* endOfStatement)
+  try parseReturnStatement
     <|> (FunctionDefinitionStatement <$> try (spaces' *> try parseFunction))
-    <|> ExpressionStatement <$> try (spaces' *> try parseExpression) <* endOfStatement
+    <|> (VariableStatement <$> try (spaces' *> try parseVariable) <* endOfStatement)
+    <|> (AssignmentStatement <$> try (spaces' *> try parseAssignment) <* endOfStatement)
+    <|> (ExpressionStatement <$> try (spaces' *> try parseExpression) <* endOfStatement)
+
+parseReturnStatement :: Parser Statement
+parseReturnStatement = do
+  _ <- spaces'
+  _ <- try (string "return")
+  expr <- try (optionMaybe (spaces1' *> parseExpression))
+  _ <- try endOfStatement
+  case expr of
+    Nothing -> return $ ReturnStatement (AtomicExpression (LiteralAtomic UnitLiteral))
+    Just ex -> return $ ReturnStatement ex
 
 endOfStatement :: Parser ()
 endOfStatement = void (char ';') <|> eol
@@ -24,19 +36,13 @@ endOfStatement = void (char ';') <|> eol
 parseFunction :: Parser Function
 parseFunction = do
   fnType <- parseType
-  _ <- spaces'
-  name <- parseFunctionName
+  _ <- spaces1'
+  name <- parseName
   _ <- char '('
-  vars <- parseVariableDeclaration `sepBy` (char ',' >> spaces')
+  vars <- try parseVariableDeclaration `sepBy` (spaces' *> char ',' <* spaces')
   _ <- char ')'
   _ <- spaces'
   _ <- char '{'
   _ <- spaces'
-  statements <- many parseStatement
-  _ <- spaces'
-  _ <- char '}'
+  statements <- manyTill (try parseStatement <* spaces') (spaces' *> char '}' <* spaces')
   return $ Function name vars fnType statements
-
-parseFunctionName :: Parser Name
-parseFunctionName = do
-  many1 letter

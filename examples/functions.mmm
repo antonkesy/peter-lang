@@ -1,0 +1,39 @@
+void main() {
+  println("main");
+  f1();
+  f2();
+  f3();
+  f4();
+  f5();
+  f6();
+}
+
+void f1() {
+  println("f1");
+}
+
+void f2() {
+  println("f2");
+  return;
+}
+
+int f3() {
+  println("f3");
+  return 42;
+}
+
+void f4() {
+  println("f4");
+  println(str(f3()));
+}
+
+str f5() {
+  println("f5");
+  return "f5";
+}
+
+void f6() {
+  println("f6");
+  print("Calling f5():")
+  println(f5());
+}

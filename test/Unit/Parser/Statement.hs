@@ -9,7 +9,8 @@ import Text.Parsec (parse)
 allTests :: [Test]
 allTests =
   [ TestLabel "simple" testSimple,
-    TestLabel "functions" testFunctions
+    TestLabel "functions" testFunctions,
+    TestLabel "return" testReturn
   ]
 
 emptyTestStatement :: Statement
@@ -81,3 +82,26 @@ testFunctions = TestCase $ do
     ( (Function "test" [VariableDeclaration "i" IntType, VariableDeclaration "k" IntType] FloatType [])
     )
     (fromRight emptyTestFunction (parse parseFunction "" "float test(int i, int k) { }"))
+
+testReturn :: Test
+testReturn = TestCase $ do
+  assertEqual
+    "empty"
+    False
+    (isRight (parse parseReturnStatement "" ""))
+  assertEqual
+    "return;"
+    (ReturnStatement (AtomicExpression (LiteralAtomic UnitLiteral)))
+    (fromRight emptyTestStatement (parse parseReturnStatement "" "return;"))
+  assertEqual
+    "return; -> statement"
+    (fromRight emptyTestStatement (parse parseReturnStatement "" "return;"))
+    (fromRight emptyTestStatement (parse parseStatement "" "return;"))
+  assertEqual
+    "return 1;"
+    (ReturnStatement (AtomicExpression (LiteralAtomic (IntLiteral 1))))
+    (fromRight emptyTestStatement (parse parseReturnStatement "" "return 1;"))
+  assertEqual
+    "return 1; -> statement"
+    (fromRight emptyTestStatement (parse parseReturnStatement "" "return 1;"))
+    (fromRight emptyTestStatement (parse parseStatement "" "return 1;"))

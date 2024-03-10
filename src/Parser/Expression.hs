@@ -3,9 +3,9 @@ module Parser.Expression (module Parser.Expression) where
 import AST
 -- import Parser.Atomic
 import Parser.Literal (parseLiteral)
+import Parser.Name
 import Parser.Operator (parseOperator)
 import Parser.Space
-import Parser.Type
 import Text.Parsec
 import Text.Parsec.String
 
@@ -29,7 +29,7 @@ parseAtomicExpression = do
 
 parseFunctionCallAtomic :: Parser Atomic
 parseFunctionCallAtomic = do
-  name <- try parseVariableName
+  name <- try parseName
   _ <- char '('
   args <- try (parseExpression `sepBy` (spaces' >> char ',' >> spaces'))
   _ <- char ')'
@@ -39,4 +39,4 @@ parseAtomic :: Parser Atomic
 parseAtomic =
   (LiteralAtomic <$> try parseLiteral)
     <|> try parseFunctionCallAtomic
-    <|> (VariableAtomic <$> try parseVariableName)
+    <|> (VariableAtomic <$> try parseName)

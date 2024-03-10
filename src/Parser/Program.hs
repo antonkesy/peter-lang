@@ -9,5 +9,5 @@ import Text.Parsec.String
 -- TODO: rename to File
 parseProgram :: Parser Program
 parseProgram = do
-  statements <- manyTill (try (spaces' *> parseStatement <* spaces')) (try (spaces' *> eof))
+  statements <- manyTill (spaces' *> parseStatement <* spaces') (try (spaces' *> eof))
   return $ Program statements

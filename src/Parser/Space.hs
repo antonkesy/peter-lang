@@ -15,5 +15,5 @@ space' =
 spaces' :: Parser ()
 spaces' = skipMany space'
 
-spaces1 :: Parser ()
-spaces1 = skipMany1 space'
+spaces1' :: Parser ()
+spaces1' = skipMany1 space'

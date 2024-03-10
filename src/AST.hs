@@ -28,7 +28,12 @@ type Comment = String
 data Type = IntType | FloatType | BoolType | UnitType | CustomType Name | StringType
   deriving (Show, Eq)
 
-data Statement = VariableStatement Variable | AssignmentStatement Assignment | FunctionDefinitionStatement Function | ExpressionStatement Expression
+data Statement
+  = VariableStatement Variable
+  | AssignmentStatement Assignment
+  | FunctionDefinitionStatement Function
+  | ExpressionStatement Expression
+  | ReturnStatement Expression
   deriving (Show, Eq)
 
 data Function = Function Name [VariableDeclaration] Type [Statement]
