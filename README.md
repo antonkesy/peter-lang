@@ -32,7 +32,7 @@ Available options:
 
 ```bash
 stack run -- ./examples/main_hello_world.mmm
-stack run -- -i "int main() { print(\"Hello, World\"); }"
+stack run -- -i "void main() { print(\"Hello, World\"); }"
 
 stack run -- ./examples/short_hello_world.mmm
 stack run -- -i "print(\"Hello, World\");"
