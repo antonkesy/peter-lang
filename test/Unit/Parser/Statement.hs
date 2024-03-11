@@ -10,7 +10,8 @@ allTests :: [Test]
 allTests =
   [ TestLabel "simple" testSimple,
     TestLabel "functions" testFunctions,
-    TestLabel "return" testReturn
+    TestLabel "return" testReturn,
+    TestLabel "if" testIf
   ]
 
 emptyTestStatement :: Statement
@@ -79,7 +80,7 @@ testFunctions = TestCase $ do
     (fromRight emptyTestFunction (parse parseFunction "" "void main() { int i = 1; i = 2; }"))
   assertEqual
     "float test(int i, int k) { }"
-    ( (Function "test" [VariableDeclaration "i" IntType, VariableDeclaration "k" IntType] FloatType [])
+    ( Function "test" [VariableDeclaration "i" IntType, VariableDeclaration "k" IntType] FloatType []
     )
     (fromRight emptyTestFunction (parse parseFunction "" "float test(int i, int k) { }"))
 
@@ -105,3 +106,28 @@ testReturn = TestCase $ do
     "return 1; -> statement"
     (fromRight emptyTestStatement (parse parseReturnStatement "" "return 1;"))
     (fromRight emptyTestStatement (parse parseStatement "" "return 1;"))
+
+testIf :: Test
+testIf = TestCase $ do
+  assertEqual
+    "empty"
+    False
+    (isRight (parse parseControl "" ""))
+  assertEqual
+    "if true {}"
+    (ControlStatement (IfControl (AtomicExpression (LiteralAtomic (BoolLiteral True))) [] Nothing))
+    (either (const emptyTestStatement) ControlStatement (parse parseControl "" "if true {}"))
+  assertEqual
+    "if true {} -> statement"
+    (either (const emptyTestStatement) ControlStatement (parse parseControl "" "if true {}"))
+    (fromRight emptyTestStatement (parse parseStatement "" "if true {}"))
+  assertEqual
+    "if true { return 0; } else { return 1; }"
+    ( ControlStatement
+        ( IfControl
+            (AtomicExpression (LiteralAtomic (BoolLiteral True)))
+            [ReturnStatement (AtomicExpression (LiteralAtomic (IntLiteral 0)))]
+            (Just [ReturnStatement (AtomicExpression (LiteralAtomic (IntLiteral 1)))])
+        )
+    )
+    (either (const emptyTestStatement) ControlStatement (parse parseControl "" "if true { return 0; } else { return 1; }"))

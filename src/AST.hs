@@ -28,12 +28,16 @@ type Comment = String
 data Type = IntType | FloatType | BoolType | UnitType | CustomType Name | StringType
   deriving (Show, Eq)
 
+data Control = IfControl Expression [Statement] (Maybe [Statement])
+  deriving (Show, Eq)
+
 data Statement
   = VariableStatement Variable
   | AssignmentStatement Assignment
   | FunctionDefinitionStatement Function
   | ExpressionStatement Expression
   | ReturnStatement Expression
+  | ControlStatement Control
   deriving (Show, Eq)
 
 data Function = Function Name [VariableDeclaration] Type [Statement]

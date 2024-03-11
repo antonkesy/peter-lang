@@ -31,6 +31,7 @@ hasEntryPoint (Program statements) =
     isMainFunction _ = False
     isGlobalStatement (AssignmentStatement _) = True
     isGlobalStatement (ExpressionStatement _) = True
+    isGlobalStatement (ControlStatement _) = True
     isGlobalStatement _ = False
 
 -- TODO: check no name clash with built-in functions

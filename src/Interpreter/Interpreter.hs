@@ -37,6 +37,8 @@ interpretStatement (InterpretState state _) (FunctionDefinitionStatement _) = do
 interpretStatement (InterpretState state _) (ReturnStatement expression) = do
   ret <- interpretExpression state expression
   return (InterpretState state (Just ret))
+interpretStatement (InterpretState state _) (ControlStatement control) = do
+  interpretControl state control
 
 updateState :: ProgramState -> Name -> Value -> ProgramState
 updateState (ProgramState vars funs) name value = ProgramState (Map.insert name value vars) funs
@@ -106,4 +108,30 @@ interpretOperation Minus (FloatValue left) (FloatValue right) = FloatValue $ lef
 interpretOperation Multiply (IntValue left) (IntValue right) = IntValue $ left * right
 interpretOperation Multiply (FloatValue left) (FloatValue right) = FloatValue $ left * right
 interpretOperation Divide (IntValue left) (IntValue right) = IntValue $ left `div` right
+interpretOperation Lt (IntValue left) (IntValue right) = BoolValue $ left < right
+interpretOperation Gt (IntValue left) (IntValue right) = BoolValue $ left > right
+interpretOperation Le (IntValue left) (IntValue right) = BoolValue $ left <= right
+interpretOperation Ge (IntValue left) (IntValue right) = BoolValue $ left >= right
+interpretOperation Eq (IntValue left) (IntValue right) = BoolValue $ left == right
 interpretOperation operator left right = error $ "Unsupported operation: " ++ show operator ++ " " ++ show left ++ " " ++ show right
+
+interpretControl :: ProgramState -> Control -> IO InterpretState
+interpretControl (ProgramState vars funs) (IfControl test body elseBody) = do
+  testValue <- interpretExpression (ProgramState vars funs) test
+  if not (isBoolValue testValue)
+    then do error "Control statement test must be a boolean value."
+    else do
+      if testValue == BoolValue True
+        then do
+          (InterpretState _ ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) body
+          return $ InterpretState (ProgramState vars funs) ret
+        else do
+          case elseBody of
+            Just elseStatements -> do
+              (InterpretState _ ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) elseStatements
+              return $ InterpretState (ProgramState vars funs) ret
+            Nothing -> return $ InterpretState (ProgramState vars funs) Nothing
+  where
+    isBoolValue :: Value -> Bool
+    isBoolValue (BoolValue _) = True
+    isBoolValue _ = False

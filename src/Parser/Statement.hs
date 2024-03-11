@@ -14,7 +14,8 @@ import Text.Parsec.String
 
 parseStatement :: Parser Statement
 parseStatement =
-  try parseReturnStatement
+  (ControlStatement <$> try (spaces' *> try parseControl))
+    <|> try parseReturnStatement
     <|> (FunctionDefinitionStatement <$> try (spaces' *> try parseFunction))
     <|> (VariableStatement <$> try (spaces' *> try parseVariable) <* endOfStatement)
     <|> (AssignmentStatement <$> try (spaces' *> try parseAssignment) <* endOfStatement)
@@ -46,3 +47,20 @@ parseFunction = do
   _ <- spaces'
   statements <- manyTill (try parseStatement <* spaces') (spaces' *> char '}' <* spaces')
   return $ Function name vars fnType statements
+
+parseControl :: Parser Control
+parseControl =
+  try parseIfControl
+
+parseIfControl :: Parser Control
+parseIfControl = do
+  _ <- spaces'
+  _ <- try (string "if")
+  test <- try (spaces1' *> parseExpression)
+  _ <- spaces1' *> char '{'
+  trueBlock <- spaces' *> many (try parseStatement)
+  _ <- spaces' *> char '}'
+  elseBlock <- optionMaybe (try (spaces' *> string "else" *> spaces' *> char '{' *> spaces' *> many parseStatement <* spaces' <* char '}'))
+  case elseBlock of
+    Nothing -> return $ IfControl test trueBlock Nothing
+    Just els -> return $ IfControl test trueBlock (Just els)
