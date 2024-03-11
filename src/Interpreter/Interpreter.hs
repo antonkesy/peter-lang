@@ -62,17 +62,29 @@ interpretAtomic (ProgramState vars funs) (FunctionCallAtomic name args) = do
   let isBuiltIn = Map.lookup name getAllBuiltIns
   case isBuiltIn of
     Just (BuiltIn _ _ fn) -> do
-      argValues <- mapM (interpretExpression (ProgramState vars funs)) args
+      argValues <- getArgValues args
       fn argValues
     Nothing -> do
       let fun = Map.lookup name funs
       case fun of
-        Just (FunctionDefinitionStatement (Function _ _ _ body)) -> do
-          (InterpretState _ ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) body
+        Just (FunctionDefinitionStatement (Function _ argDef _ body)) -> do
+          params <- mapExpressionToParam argDef args
+          let fnScope = ProgramState (Map.union params vars) funs
+          (InterpretState _ ret) <- foldM interpretStatement (InterpretState fnScope Nothing) body
           case ret of
             Just value -> return value
             Nothing -> error $ "Function did not return a value: " ++ name
         Nothing -> error $ "Function not found: " ++ name
+  where
+    getArgValues :: [Expression] -> IO [Value]
+    getArgValues = mapM (interpretExpression (ProgramState vars funs))
+    mapExpressionToParam :: [VariableDeclaration] -> [Expression] -> IO (Map Name Value)
+    mapExpressionToParam [] [] = pure Map.empty
+    mapExpressionToParam (VariableDeclaration n _ : rest) (expression : restExp) = do
+      val <- interpretExpression (ProgramState vars funs) expression
+      restMap <- mapExpressionToParam rest restExp
+      return (Map.insert n val restMap)
+    mapExpressionToParam _ _ = error "Invalid number of arguments"
 
 interpretLiteral :: Literal -> IO Value
 interpretLiteral (IntLiteral value) = do
