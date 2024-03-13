@@ -28,7 +28,9 @@ type Comment = String
 data Type = IntType | FloatType | BoolType | UnitType | CustomType Name | StringType
   deriving (Show, Eq)
 
-data Control = IfControl Expression [Statement] (Maybe [Statement])
+data Control
+  = IfControl Expression [Statement] (Maybe [Statement])
+  | WhileControl Expression [Statement]
   deriving (Show, Eq)
 
 data Statement

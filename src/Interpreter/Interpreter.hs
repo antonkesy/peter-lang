@@ -43,6 +43,13 @@ interpretStatement (InterpretState state _) (ControlStatement control) = do
 updateState :: ProgramState -> Name -> Value -> ProgramState
 updateState (ProgramState vars funs) name value = ProgramState (Map.insert name value vars) funs
 
+-- Update variable in outer scope
+updateOuterState :: ProgramState -> ProgramState -> ProgramState
+updateOuterState (ProgramState outerVars funs) (ProgramState innerVars _) =
+  ProgramState (Map.unionWithKey (\_ inner _outer -> inner) innerVars outerVars) funs
+
+-- if Map.member name vars then updateState (ProgramState vars funs) name value else ProgramState vars funs
+
 interpretExpression :: ProgramState -> Expression -> IO Value
 interpretExpression state (AtomicExpression atomic) = do
   interpretAtomic state atomic
@@ -117,20 +124,33 @@ interpretOperation operator left right = error $ "Unsupported operation: " ++ sh
 
 interpretControl :: ProgramState -> Control -> IO InterpretState
 interpretControl (ProgramState vars funs) (IfControl test body elseBody) = do
+  (BoolValue testValue) <- isTestValue (ProgramState vars funs) test
+  if testValue
+    then do
+      (InterpretState innerVars ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) body
+      return $ InterpretState (updateOuterState (ProgramState vars funs) innerVars) ret
+    else do
+      case elseBody of
+        Just elseStatements -> do
+          (InterpretState innerVars ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) elseStatements
+          return $ InterpretState (updateOuterState (ProgramState vars funs) innerVars) ret
+        Nothing -> return $ InterpretState (ProgramState vars funs) Nothing
+interpretControl (ProgramState vars funs) (WhileControl test body) = do
+  (BoolValue testValue) <- isTestValue (ProgramState vars funs) test
+  if testValue
+    then do
+      (InterpretState innerVars ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) body
+      case ret of
+        Just value -> return $ InterpretState (updateOuterState (ProgramState vars funs) innerVars) (Just value)
+        Nothing -> interpretControl (updateOuterState (ProgramState vars funs) innerVars) (WhileControl test body)
+    else return $ InterpretState (ProgramState vars funs) Nothing
+
+isTestValue :: ProgramState -> Expression -> IO Value
+isTestValue (ProgramState vars funs) test = do
   testValue <- interpretExpression (ProgramState vars funs) test
   if not (isBoolValue testValue)
     then do error "Control statement test must be a boolean value."
-    else do
-      if testValue == BoolValue True
-        then do
-          (InterpretState _ ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) body
-          return $ InterpretState (ProgramState vars funs) ret
-        else do
-          case elseBody of
-            Just elseStatements -> do
-              (InterpretState _ ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) elseStatements
-              return $ InterpretState (ProgramState vars funs) ret
-            Nothing -> return $ InterpretState (ProgramState vars funs) Nothing
+    else return testValue
   where
     isBoolValue :: Value -> Bool
     isBoolValue (BoolValue _) = True

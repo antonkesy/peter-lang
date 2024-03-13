@@ -1,5 +1,17 @@
+int i = 0;
 if 1 < 2 {
   println("true");
+  i = 1;
 } else {
   println("false");
+  i = -1;
 }
+println(str(i));
+
+int j = 0;
+println(str(j));
+while j < 10 {
+  println(str(j));
+  j = j + 1;
+}
+print(str(j));

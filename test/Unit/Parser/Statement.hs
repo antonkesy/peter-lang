@@ -11,7 +11,8 @@ allTests =
   [ TestLabel "simple" testSimple,
     TestLabel "functions" testFunctions,
     TestLabel "return" testReturn,
-    TestLabel "if" testIf
+    TestLabel "if" testIf,
+    TestLabel "while" testWhile
   ]
 
 emptyTestStatement :: Statement
@@ -131,3 +132,19 @@ testIf = TestCase $ do
         )
     )
     (either (const emptyTestStatement) ControlStatement (parse parseControl "" "if true { return 0; } else { return 1; }"))
+
+testWhile :: Test
+testWhile = TestCase $ do
+  assertEqual
+    "while true {}"
+    (ControlStatement (WhileControl (AtomicExpression (LiteralAtomic (BoolLiteral True))) []))
+    (either (const emptyTestStatement) ControlStatement (parse parseControl "" "while true {}"))
+  assertEqual
+    "while true { return 0; }"
+    ( ControlStatement
+        ( WhileControl
+            (AtomicExpression (LiteralAtomic (BoolLiteral True)))
+            [ReturnStatement (AtomicExpression (LiteralAtomic (IntLiteral 0)))]
+        )
+    )
+    (either (const emptyTestStatement) ControlStatement (parse parseControl "" "while true { return 0; }"))

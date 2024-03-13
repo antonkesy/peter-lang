@@ -50,7 +50,7 @@ parseFunction = do
 
 parseControl :: Parser Control
 parseControl =
-  try parseIfControl
+  try parseIfControl <|> try parseWhileControl
 
 parseIfControl :: Parser Control
 parseIfControl = do
@@ -64,3 +64,13 @@ parseIfControl = do
   case elseBlock of
     Nothing -> return $ IfControl test trueBlock Nothing
     Just els -> return $ IfControl test trueBlock (Just els)
+
+parseWhileControl :: Parser Control
+parseWhileControl = do
+  _ <- spaces'
+  _ <- try (string "while")
+  test <- try (spaces1' *> parseExpression)
+  _ <- spaces1' *> char '{'
+  block <- spaces' *> many (try parseStatement)
+  _ <- spaces' *> char '}'
+  return $ WhileControl test block
