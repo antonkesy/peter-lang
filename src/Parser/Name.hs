@@ -6,6 +6,8 @@ import Text.Parsec.String
 
 parseName :: Parser Name
 parseName = do
-  fistChar <- letter
-  rest <- many (digit <|> letter)
+  fistChar <- startChar
+  rest <- many (digit <|> startChar)
   return (fistChar : rest)
+  where
+    startChar = letter <|> char '_'

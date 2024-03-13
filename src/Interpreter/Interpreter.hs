@@ -35,6 +35,7 @@ interpretStatement (InterpretState state _) (ExpressionStatement expression) = d
 interpretStatement (InterpretState state _) (FunctionDefinitionStatement _) = do
   return (InterpretState state Nothing)
 interpretStatement (InterpretState state _) (ReturnStatement expression) = do
+  -- TODO: return should cancel the current function
   ret <- interpretExpression state expression
   return (InterpretState state (Just ret))
 interpretStatement (InterpretState state _) (ControlStatement control) = do

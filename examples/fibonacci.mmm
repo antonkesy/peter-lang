@@ -1,0 +1,12 @@
+void main() {
+  int fib = fibbonacci_single_return(15);
+  println(str(fib));
+}
+
+int fibbonacci_single_return(int n) {
+  int ret = n;
+  if n > 1 {
+    ret = fibbonacci_single_return(n - 1) + fibbonacci_single_return(n - 2);
+  }
+  return ret;
+}
