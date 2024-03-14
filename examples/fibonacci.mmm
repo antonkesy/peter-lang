@@ -1,6 +1,9 @@
 void main() {
-  int fib = fibbonacci_single_return(15);
-  println(str(fib));
+  int fib_v1 = fibbonacci_inline(15);
+  println(str(fib_v1));
+
+  int fib_v2 = fibbonacci_single_return(15);
+  println(str(fib_v2));
 }
 
 int fibbonacci_single_return(int n) {
@@ -9,4 +12,11 @@ int fibbonacci_single_return(int n) {
     ret = fibbonacci_single_return(n - 1) + fibbonacci_single_return(n - 2);
   }
   return ret;
+}
+
+int fibbonacci_inline(int n) {
+  if n < 2 {
+    return n;
+  }
+  return fibbonacci_inline(n - 1) + fibbonacci_inline(n - 2);
 }

@@ -61,4 +61,4 @@ toString =
       [IntValue i] -> show i
       [FloatValue f] -> show f
       [BoolValue b] -> show b
-      _ -> error "No matching type for str"
+      _ -> error ("No matching type for str: " ++ show val)
