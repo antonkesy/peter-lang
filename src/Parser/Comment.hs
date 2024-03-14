@@ -10,17 +10,17 @@ consumeComment :: Parser ()
 consumeComment =
   void
     ( try parseSingleLineComment
-        <|> try parseMultiLineComment
+        <|> parseMultiLineComment
     )
 
 parseComment :: Parser Comment
 parseComment =
-  try parseSingleLineComment <|> try parseMultiLineComment
+  try parseSingleLineComment <|> parseMultiLineComment
 
 parseSingleLineComment :: Parser Comment
 parseSingleLineComment =
-  string "//" *> manyTill anyChar (try eol)
+  string "//" *> manyTill anyChar eol
 
 parseMultiLineComment :: Parser Comment
 parseMultiLineComment =
-  string "/*" *> manyTill anyChar (try (string "*/"))
+  string "/*" *> manyTill anyChar (string "*/")

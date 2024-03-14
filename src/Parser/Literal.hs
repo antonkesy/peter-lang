@@ -10,7 +10,7 @@ parseLiteral =
     <|> try parseBoolLiteral
     <|> try parseFloatLiteral
     <|> try parseIntLiteral
-    <|> try praseStringLiteral
+    <|> praseStringLiteral
 
 parseIntLiteral :: Parser Literal
 parseIntLiteral = do
