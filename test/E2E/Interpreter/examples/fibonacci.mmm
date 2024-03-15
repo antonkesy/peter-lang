@@ -1,0 +1,22 @@
+void main() {
+  int fib_v1 = fibbonacci_inline(15);
+  print(str(fib_v1));
+
+  int fib_v2 = fibbonacci_single_return(15);
+  print(str(fib_v2));
+}
+
+int fibbonacci_single_return(int n) {
+  int ret = n;
+  if n > 1 {
+    ret = fibbonacci_single_return(n - 1) + fibbonacci_single_return(n - 2);
+  }
+  return ret;
+}
+
+int fibbonacci_inline(int n) {
+  if n < 2 {
+    return n;
+  }
+  return fibbonacci_inline(n - 1) + fibbonacci_inline(n - 2);
+}
