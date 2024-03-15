@@ -4,11 +4,18 @@ import AST
 import Data.Map.Strict as Map
 import qualified Data.Text as T
 import Interpreter.ProgramState
+import System.IO
 
 data BuiltIn = BuiltIn Name Type ([Value] -> IO Value)
 
 getAllBuiltIns :: Map String BuiltIn
-getAllBuiltIns = Map.fromList [("print", Interpreter.BuiltIn.print), ("println", printLn), ("str", toString)]
+getAllBuiltIns =
+  Map.fromList
+    [ ("print", Interpreter.BuiltIn.print),
+      ("println", printLn),
+      ("str", toString),
+      ("input", getInput)
+    ]
 
 print :: BuiltIn
 print =
@@ -17,7 +24,9 @@ print =
     UnitType
     ( \val -> do
         case val of
-          [StringValue s] -> putStr (replaceEscaped s)
+          [StringValue s] -> do
+            putStr (replaceEscaped s)
+            hFlush stdout
           _ -> error "Not a single string"
         pure UnitValue
     )
@@ -62,3 +71,27 @@ toString =
       [FloatValue f] -> show f
       [BoolValue b] -> show b
       _ -> error ("No matching type for str: " ++ show val)
+
+getInput :: BuiltIn
+getInput =
+  BuiltIn
+    "input"
+    StringType
+    ( \_ -> do
+        StringValue <$> getLine
+    )
+
+toInt :: BuiltIn
+toInt =
+  BuiltIn
+    "toInt"
+    IntType
+    ( \val -> do
+        pure (IntValue (valueToInt val))
+    )
+  where
+    valueToInt :: [Value] -> Int
+    valueToInt val = case val of
+      [IntValue i] -> i
+      [StringValue s] -> read s
+      _ -> error ("No matching type for toInt: " ++ show val)

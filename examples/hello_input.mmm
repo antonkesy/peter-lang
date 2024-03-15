@@ -1,0 +1,6 @@
+void main() {
+  print("Input name: ");
+  str name = input();
+  print("Hello, ");
+  println(name);
+}
