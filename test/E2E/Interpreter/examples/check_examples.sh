@@ -24,6 +24,7 @@ check_stdout() {
         echo "Output for $file does not match expected output"
         echo "Actual output: $actual_output"
         echo "Expected output: $expected_output"
+        exit 1
     fi
 }
 

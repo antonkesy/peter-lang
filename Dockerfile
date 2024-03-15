@@ -23,9 +23,17 @@ COPY . /peter-lang
 
 # cancel the build if there are formatting errors
 RUN ormolu --mode check $(find . -name '*.hs')
+
 # build project
 RUN stack build
+
+# run tests
 RUN stack test
+
+WORKDIR /peter-lang/test/E2E/Interpreter/examples
+RUN ./check_examples.sh
+WORKDIR /peter-lang
+
 # pre-commit
 RUN git init . && pre-commit install-hooks
 RUN pre-commit run --all-files
