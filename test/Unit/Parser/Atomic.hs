@@ -13,7 +13,7 @@ allTests =
   ]
 
 emptyTestAtomic :: Atomic
-emptyTestAtomic = (LiteralAtomic (UnitLiteral))
+emptyTestAtomic = LiteralAtomic UnitLiteral
 
 testSimple :: Test
 testSimple = TestCase $ do

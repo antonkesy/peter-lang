@@ -1,0 +1,12 @@
+int i = 1;
+while i <= 100  {
+  println(str(i) + ": " + fizzbuzz(i));
+  i = i + 1;
+}
+
+str fizzbuzz(int i) {
+  if 0 == (i % 15) { return "FizzBuzz"; }
+  if 0 == (i % 3) { return "Fizz"; }
+  if 0 == (i % 5) { return "Buzz"; }
+  return str(i);
+}

@@ -1,7 +1,6 @@
 module Parser.Expression (module Parser.Expression) where
 
 import AST
--- import Parser.Atomic
 import Parser.Literal (parseLiteral)
 import Parser.Name
 import Parser.Operator (parseOperator)
@@ -11,8 +10,16 @@ import Text.Parsec.String
 
 parseExpression :: Parser Expression
 parseExpression =
-  try parseOperation
-    <|> try parseAtomicExpression
+  try parseExpression'
+    <|> try
+      ( char '('
+          *> spaces'
+          *> parseExpression'
+          <* spaces'
+          <* char ')'
+      )
+  where
+    parseExpression' = try parseOperation <|> try parseAtomicExpression
 
 parseOperation :: Parser Expression
 parseOperation =
@@ -24,8 +31,17 @@ parseOperation =
     OperationExpression left op <$> try parseExpression
 
 parseAtomicExpression :: Parser Expression
-parseAtomicExpression = do
-  AtomicExpression <$> try parseAtomic
+parseAtomicExpression =
+  try parseAtomic'
+    <|> try
+      ( char '('
+          *> spaces'
+          *> parseAtomic'
+          <* spaces'
+          <* char ')'
+      )
+  where
+    parseAtomic' = AtomicExpression <$> try parseAtomic
 
 parseFunctionCallAtomic :: Parser Atomic
 parseFunctionCallAtomic = do
@@ -37,6 +53,6 @@ parseFunctionCallAtomic = do
 
 parseAtomic :: Parser Atomic
 parseAtomic =
-  (LiteralAtomic <$> try parseLiteral)
+  LiteralAtomic <$> try parseLiteral
     <|> try parseFunctionCallAtomic
-    <|> (VariableAtomic <$> try parseName)
+    <|> VariableAtomic <$> try parseName

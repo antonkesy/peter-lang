@@ -19,6 +19,10 @@ void main() {
 }
 ```
 
+## Limitations
+
+- left side of operation has to be atomic
+
 ## Usage
 
 ```bash
