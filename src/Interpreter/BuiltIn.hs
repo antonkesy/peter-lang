@@ -14,6 +14,7 @@ getAllBuiltIns =
     [ ("print", Interpreter.BuiltIn.print),
       ("println", printLn),
       ("str", toString),
+      ("int", toInt),
       ("input", getInput)
     ]
 

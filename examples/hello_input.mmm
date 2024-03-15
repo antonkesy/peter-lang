@@ -3,4 +3,10 @@ void main() {
   str name = input();
   print("Hello, ");
   println(name);
+
+  print("Input age: ");
+  int age = int(input());
+  print("You are ");
+  println(str(age));
+  print(" years old.");
 }
