@@ -6,7 +6,5 @@ void main() {
 
   print("Input age: ");
   int age = int(input());
-  print("You are ");
-  println(str(age));
-  print(" years old.");
+  println("You are " + str(age) + " years old.");
 }

@@ -4,9 +4,10 @@ import AST
 import Control.Monad (foldM)
 import qualified Data.Functor
 import Data.Map.Strict as Map
-import qualified Debug.Trace as Debug
 import Interpreter.BuiltIn
+import Interpreter.Literal
 import Interpreter.Manipulator
+import Interpreter.Operation
 import Interpreter.ProgramState
 import Interpreter.Validator
 
@@ -124,33 +125,6 @@ returnSkipWrapper state [] inFunction =
   if inFunction
     then error "missing return"
     else return (ScopeResult (variables (programState state)) Nothing)
-
-interpretLiteral :: Literal -> IO Value
-interpretLiteral (IntLiteral value) = do
-  return $ IntValue value
-interpretLiteral (FloatLiteral value) = do
-  return $ FloatValue value
-interpretLiteral (BoolLiteral value) = do
-  return $ BoolValue value
-interpretLiteral UnitLiteral = do
-  return UnitValue
-interpretLiteral (StringLiteral value) = do
-  return $ StringValue value
-
-interpretOperation :: Operator -> Value -> Value -> Value
-interpretOperation Plus (IntValue left) (IntValue right) = IntValue $ left + right
-interpretOperation Plus (FloatValue left) (FloatValue right) = FloatValue $ left + right
-interpretOperation Minus (IntValue left) (IntValue right) = IntValue $ left - right
-interpretOperation Minus (FloatValue left) (FloatValue right) = FloatValue $ left - right
-interpretOperation Multiply (IntValue left) (IntValue right) = IntValue $ left * right
-interpretOperation Multiply (FloatValue left) (FloatValue right) = FloatValue $ left * right
-interpretOperation Divide (IntValue left) (IntValue right) = IntValue $ left `div` right
-interpretOperation Lt (IntValue left) (IntValue right) = BoolValue $ left < right
-interpretOperation Gt (IntValue left) (IntValue right) = BoolValue $ left > right
-interpretOperation Le (IntValue left) (IntValue right) = BoolValue $ left <= right
-interpretOperation Ge (IntValue left) (IntValue right) = BoolValue $ left >= right
-interpretOperation Eq (IntValue left) (IntValue right) = BoolValue $ left == right
-interpretOperation operator left right = error $ "Unsupported operation: " ++ show operator ++ " " ++ show left ++ " " ++ show right
 
 interpretControl :: ProgramState -> Control -> IO InterpretState
 interpretControl (ProgramState vars funs) (IfControl test body elseBody) = do

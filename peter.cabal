@@ -28,7 +28,9 @@ library
       AST
       Interpreter.BuiltIn
       Interpreter.Interpreter
+      Interpreter.Literal
       Interpreter.Manipulator
+      Interpreter.Operation
       Interpreter.ProgramState
       Interpreter.Validator
       Parser.Assignment
