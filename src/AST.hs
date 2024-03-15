@@ -1,5 +1,3 @@
-{-# LANGUAGE GADTs #-}
-
 module AST (module AST) where
 
 type Name = String
@@ -47,8 +45,7 @@ data Statement
 data Function = Function Name [VariableDeclaration] Type [Statement]
   deriving (Show, Eq)
 
-data Program where
-  Program :: [Statement] -> Program
+data Program = Program [Statement]
   deriving (Show, Eq)
 
 data BuiltInFuction = Print | Input

@@ -17,21 +17,21 @@ parseExpression =
 parseOperation :: Parser Expression
 parseOperation =
   do
-    left <- parseAtomicExpression -- left side has to be atomic to avoid endless loop becase of left recursion
+    left <- try parseAtomicExpression -- left side has to be atomic to avoid endless loop becase of left recursion
     _ <- spaces'
-    op <- parseOperator
+    op <- try parseOperator
     _ <- spaces'
-    OperationExpression left op <$> parseExpression
+    OperationExpression left op <$> try parseExpression
 
 parseAtomicExpression :: Parser Expression
 parseAtomicExpression = do
-  AtomicExpression <$> parseAtomic
+  AtomicExpression <$> try parseAtomic
 
 parseFunctionCallAtomic :: Parser Atomic
 parseFunctionCallAtomic = do
   name <- try parseName
   _ <- char '('
-  args <- parseExpression `sepBy` (spaces' >> char ',' >> spaces')
+  args <- try (parseExpression `sepBy` (spaces' >> char ',' >> spaces'))
   _ <- char ')'
   return $ FunctionCallAtomic name args
 

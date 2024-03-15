@@ -14,19 +14,19 @@ import Text.Parsec.String
 
 parseStatement :: Parser Statement
 parseStatement =
-  ControlStatement <$> try (spaces' *> parseControl)
+  (ControlStatement <$> try (spaces' *> try parseControl))
     <|> try parseReturnStatement
-    <|> FunctionDefinitionStatement <$> try (spaces' *> parseFunction)
-    <|> VariableStatement <$> try (spaces' *> parseVariable) <* endOfStatement
-    <|> AssignmentStatement <$> try (spaces' *> parseAssignment) <* endOfStatement
-    <|> ExpressionStatement <$> try (spaces' *> parseExpression) <* endOfStatement
+    <|> (FunctionDefinitionStatement <$> try (spaces' *> try parseFunction))
+    <|> (VariableStatement <$> try (spaces' *> try parseVariable) <* endOfStatement)
+    <|> (AssignmentStatement <$> try (spaces' *> try parseAssignment) <* endOfStatement)
+    <|> (ExpressionStatement <$> try (spaces' *> try parseExpression) <* endOfStatement)
 
 parseReturnStatement :: Parser Statement
 parseReturnStatement = do
   _ <- spaces'
-  _ <- string "return"
-  expr <- optionMaybe (spaces1' *> parseExpression)
-  _ <- endOfStatement
+  _ <- try (string "return")
+  expr <- try (optionMaybe (spaces1' *> parseExpression))
+  _ <- try endOfStatement
   case expr of
     Nothing -> return $ ReturnStatement (AtomicExpression (LiteralAtomic UnitLiteral))
     Just ex -> return $ ReturnStatement ex
@@ -40,27 +40,27 @@ parseFunction = do
   _ <- spaces1'
   name <- parseName
   _ <- char '('
-  vars <- parseVariableDeclaration `sepBy` (spaces' *> char ',' <* spaces')
+  vars <- try parseVariableDeclaration `sepBy` (spaces' *> char ',' <* spaces')
   _ <- char ')'
   _ <- spaces'
   _ <- char '{'
   _ <- spaces'
-  statements <- manyTill (parseStatement <* spaces') (spaces' *> char '}' <* spaces')
+  statements <- manyTill (try parseStatement <* spaces') (spaces' *> char '}' <* spaces')
   return $ Function name vars fnType statements
 
 parseControl :: Parser Control
 parseControl =
-  parseIfControl <|> parseWhileControl
+  try parseIfControl <|> try parseWhileControl
 
 parseIfControl :: Parser Control
 parseIfControl = do
   _ <- spaces'
-  _ <- string "if"
-  test <- spaces1' *> parseExpression
+  _ <- try (string "if")
+  test <- try (spaces1' *> parseExpression)
   _ <- spaces1' *> char '{'
-  trueBlock <- spaces' *> many parseStatement
+  trueBlock <- spaces' *> many (try parseStatement)
   _ <- spaces' *> char '}'
-  elseBlock <- optionMaybe (spaces' *> string "else" *> spaces' *> char '{' *> spaces' *> many parseStatement <* spaces' <* char '}')
+  elseBlock <- optionMaybe (try (spaces' *> string "else" *> spaces' *> char '{' *> spaces' *> many parseStatement <* spaces' <* char '}'))
   case elseBlock of
     Nothing -> return $ IfControl test trueBlock Nothing
     Just els -> return $ IfControl test trueBlock (Just els)
@@ -68,9 +68,9 @@ parseIfControl = do
 parseWhileControl :: Parser Control
 parseWhileControl = do
   _ <- spaces'
-  _ <- string "while"
-  test <- spaces1' *> parseExpression
+  _ <- try (string "while")
+  test <- try (spaces1' *> parseExpression)
   _ <- spaces1' *> char '{'
-  block <- spaces' *> many parseStatement
+  block <- spaces' *> many (try parseStatement)
   _ <- spaces' *> char '}'
   return $ WhileControl test block
