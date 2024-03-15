@@ -15,6 +15,7 @@ getAllBuiltIns =
       ("println", printLn),
       ("str", toString),
       ("int", toInt),
+      ("float", toFloat),
       ("input", getInput)
     ]
 
@@ -96,3 +97,18 @@ toInt =
       [IntValue i] -> i
       [StringValue s] -> read s
       _ -> error ("No matching type for toInt: " ++ show val)
+
+toFloat :: BuiltIn
+toFloat =
+  BuiltIn
+    "toFloat"
+    FloatType
+    ( \val -> do
+        pure (FloatValue (valueToFloat val))
+    )
+  where
+    valueToFloat :: [Value] -> Float
+    valueToFloat val = case val of
+      [FloatValue f] -> f
+      [StringValue s] -> read s
+      _ -> error ("No matching type for toFloat: " ++ show val)
