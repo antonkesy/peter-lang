@@ -1,3 +1,5 @@
+{-# LANGUAGE GADTs #-}
+
 module AST (module AST) where
 
 type Name = String
@@ -5,7 +7,7 @@ type Name = String
 data Operator = Plus | Minus | Multiply | Divide | Modulus | And | Or | Not | Eq | Neq | Lt | Gt | Le | Ge
   deriving (Show, Eq)
 
-data Literal = IntLiteral Int | FloatLiteral Float | BoolLiteral Bool | UnitLiteral | StringLiteral String
+data Literal = IntLiteral Int | FloatLiteral Float | BoolLiteral Bool | UnitLiteral | StringLiteral String | UndefinedLiteral
   deriving (Show, Eq)
 
 data Atomic = LiteralAtomic Literal | VariableAtomic Name | FunctionCallAtomic Name [Expression]
@@ -25,7 +27,7 @@ data Assignment = Assignment Name Expression
 
 type Comment = String
 
-data Type = IntType | FloatType | BoolType | UnitType | CustomType Name | StringType
+data Type = IntType | FloatType | BoolType | UnitType | CustomType Name | StringType | UndefinedType
   deriving (Show, Eq)
 
 data Control
@@ -33,19 +35,25 @@ data Control
   | WhileControl Expression [Statement]
   deriving (Show, Eq)
 
+data Struct = Struct Name [VariableDeclaration]
+  deriving (Show, Eq)
+
 data Statement
-  = VariableStatement Variable
+  = VariableDefinitionStatement Variable
   | AssignmentStatement Assignment
   | FunctionDefinitionStatement Function
   | ExpressionStatement Expression
   | ReturnStatement Expression
   | ControlStatement Control
+  | StructStatement Struct
+  | VariableDeclarationStatement VariableDeclaration
   deriving (Show, Eq)
 
 data Function = Function Name [VariableDeclaration] Type [Statement]
   deriving (Show, Eq)
 
-data Program = Program [Statement]
+data Program where
+  Program :: [Statement] -> Program
   deriving (Show, Eq)
 
 data BuiltInFuction = Print | Input

@@ -9,6 +9,7 @@ file_paths=(
     "main_hello_world.mmm:Hello, World!"
     "short_hello_world.mmm:Hello, World!"
     "print.mmm:Hello, World!1"
+    "structs.mmm:23"
 )
 
 # Function to run program over file and check stdout

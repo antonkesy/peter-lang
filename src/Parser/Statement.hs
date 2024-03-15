@@ -7,6 +7,7 @@ import Parser.EndOfLine
 import Parser.Expression
 import Parser.Name
 import Parser.Space
+import Parser.Struct
 import Parser.Type
 import Parser.Variable
 import Text.Parsec
@@ -15,9 +16,11 @@ import Text.Parsec.String
 parseStatement :: Parser Statement
 parseStatement =
   (ControlStatement <$> try (spaces' *> try parseControl))
+    <|> (StructStatement <$> try (spaces' *> try parseStruct))
     <|> try parseReturnStatement
     <|> (FunctionDefinitionStatement <$> try (spaces' *> try parseFunction))
-    <|> (VariableStatement <$> try (spaces' *> try parseVariable) <* endOfStatement)
+    <|> (VariableDefinitionStatement <$> try (spaces' *> try parseVariable) <* endOfStatement)
+    <|> (VariableDeclarationStatement <$> try (spaces' *> try parseVariableDeclaration) <* endOfStatement)
     <|> (AssignmentStatement <$> try (spaces' *> try parseAssignment) <* endOfStatement)
     <|> (ExpressionStatement <$> try (spaces' *> try parseExpression) <* endOfStatement)
 

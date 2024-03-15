@@ -32,3 +32,11 @@ testSimple = TestCase $ do
     "Variable + Number Assignment"
     (Assignment "k" (OperationExpression (AtomicExpression (VariableAtomic "k")) Plus (AtomicExpression (LiteralAtomic (IntLiteral 1)))))
     (fromRight emptyTestAssignment (parse parseAssignment "" "k = k + 1"))
+  assertEqual
+    "x = 2;"
+    (Assignment "x" (AtomicExpression (LiteralAtomic (IntLiteral 2))))
+    (fromRight emptyTestAssignment (parse parseAssignment "" "x = 2"))
+  assertEqual
+    "x.y = 2;"
+    (Assignment "x.y" (AtomicExpression (LiteralAtomic (IntLiteral 2))))
+    (fromRight emptyTestAssignment (parse parseAssignment "" "x.y = 2"))

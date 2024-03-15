@@ -23,7 +23,7 @@ testSimple = TestCase $ do
   assertEqual
     "int k = 1;"
     ( Program
-        [ VariableStatement
+        [ VariableDefinitionStatement
             ( Variable
                 (VariableDeclaration "k" IntType)
                 ( AtomicExpression (LiteralAtomic (IntLiteral 1))
@@ -35,13 +35,13 @@ testSimple = TestCase $ do
   assertEqual
     "int k = 1; int j = 2;"
     ( Program
-        [ VariableStatement
+        [ VariableDefinitionStatement
             ( Variable
                 (VariableDeclaration "k" IntType)
                 ( AtomicExpression (LiteralAtomic (IntLiteral 1))
                 )
             ),
-          VariableStatement
+          VariableDefinitionStatement
             ( Variable
                 (VariableDeclaration "j" IntType)
                 ( AtomicExpression (LiteralAtomic (IntLiteral 2))
@@ -65,7 +65,7 @@ testSimple = TestCase $ do
   assertEqual
     "int k = 1; j = 2;"
     ( Program
-        [ VariableStatement
+        [ VariableDefinitionStatement
             ( Variable
                 (VariableDeclaration "k" IntType)
                 ( AtomicExpression (LiteralAtomic (IntLiteral 1))

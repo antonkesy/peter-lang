@@ -1,0 +1,15 @@
+struct T {
+  int x;
+  int y;
+}
+
+T n;
+n.x = 2;
+print(str(n.x))
+
+int i = 3;
+
+T n1;
+n1.y = i;
+
+print(str(n1.y))

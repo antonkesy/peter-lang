@@ -1,7 +1,7 @@
 module Interpreter.Interpreter (module Interpreter.Interpreter) where
 
 import AST
-import Control.Monad (foldM)
+import Control.Monad (foldM, foldM_)
 import qualified Data.Functor
 import Data.Map.Strict as Map
 import Interpreter.BuiltIn
@@ -16,25 +16,30 @@ interpret (Program statements) = do
   isValid <- validate (Program statements)
   if isValid
     then do
-      -- putStrLn "Valid program"
       let correctedStatments = ensureEntryPoint statements
-      let functionMap = getFunctionMap correctedStatments
-      -- print correctedStatments
-      _ <- foldM interpretStatement (InterpretState (ProgramState empty functionMap) Nothing) correctedStatments
-      -- putStrLn $ "End state: " ++ show endState
-      return ()
-    else do
-      putStrLn "Invalid program"
+          functionMap = getFunctionMap correctedStatments
+          customTypeMap = getCustomTypeMap correctedStatments
+      foldM_ interpretStatement (InterpretState (ProgramState empty functionMap customTypeMap) Nothing) correctedStatments
+    else error "Invalid program"
 
 interpretStatement :: InterpretState -> Statement -> IO InterpretState
-interpretStatement (InterpretState state _) (VariableStatement (Variable (VariableDeclaration name _) expression)) = do
+interpretStatement (InterpretState state _) (VariableDefinitionStatement (Variable (VariableDeclaration name t) expression)) = do
   (ScopeResult innerVars ret) <- interpretExpression state expression
   let newState = updateOuterStateV state innerVars
-  return (InterpretState (updateState newState name ret) Nothing)
+      newState' = addStructMembersToState newState name t
+  return (InterpretState (updateState newState' name ret) Nothing)
+interpretStatement (InterpretState state _) (VariableDeclarationStatement (VariableDeclaration name t)) = do
+  let newState = updateState state name (Just UndefinedValue)
+      newState' = addStructMembersToState newState name t
+  return (InterpretState newState' Nothing)
 interpretStatement (InterpretState state _) (AssignmentStatement (Assignment name expression)) = do
-  (ScopeResult innerVars ret) <- interpretExpression state expression
-  let newState = updateOuterStateV state innerVars
-  return (InterpretState (updateState newState name ret) Nothing)
+  case Map.lookup name (variables state) of
+    Just UndefinedValue -> error "Can't copy structs" -- TODO: deep copy structs
+    _ -> do
+      (ScopeResult innerVars ret) <- interpretExpression state expression
+      let newState = updateOuterStateV state innerVars
+      -- TODO: deep copy structs
+      return (InterpretState (updateState newState name ret) Nothing)
 interpretStatement (InterpretState state _) (ExpressionStatement expression) = do
   _ <- interpretExpression state expression
   return (InterpretState state Nothing)
@@ -46,23 +51,8 @@ interpretStatement (InterpretState state _) (ReturnStatement expression) = do
   return (InterpretState newState ret)
 interpretStatement (InterpretState state _) (ControlStatement control) = do
   interpretControl state control
-
-updateState :: ProgramState -> Name -> Maybe Value -> ProgramState
-updateState (ProgramState vars funs) name value = do
-  case value of
-    Just v -> ProgramState (Map.insert name v vars) funs
-    Nothing -> ProgramState vars funs
-
--- Update variable in outer scope
-updateOuterState :: ProgramState -> ProgramState -> ProgramState
-updateOuterState (ProgramState outerVars funs) (ProgramState innerVars _) =
-  ProgramState (Map.unionWithKey (\_ inner _outer -> inner) innerVars outerVars) funs
-
-updateOuterStateV :: ProgramState -> Map Name Value -> ProgramState
-updateOuterStateV (ProgramState outerVars funs) innerVars =
-  ProgramState
-    (Map.unionWithKey (\_ inner _outer -> inner) innerVars outerVars)
-    funs
+interpretStatement (InterpretState state _) (StructStatement _) = do
+  return (InterpretState state Nothing)
 
 interpretExpression :: ProgramState -> Expression -> IO ScopeResult
 interpretExpression state (AtomicExpression atomic) = do
@@ -74,15 +64,15 @@ interpretExpression state (OperationExpression left operator right) = do
   return (ScopeResult (variables state) (Just value))
 
 interpretAtomic :: ProgramState -> Atomic -> IO ScopeResult
-interpretAtomic (ProgramState vars _) (LiteralAtomic literal) = do
+interpretAtomic (ProgramState vars _ _) (LiteralAtomic literal) = do
   ret <- interpretLiteral literal
   return (ScopeResult vars (Just ret))
-interpretAtomic (ProgramState vars _) (VariableAtomic name) = do
+interpretAtomic (ProgramState vars _ _) (VariableAtomic name) = do
   let varValue = Map.lookup name vars
   return $ case varValue of
     Just value -> ScopeResult vars (Just value)
     Nothing -> error $ "Variable not found: " ++ name
-interpretAtomic (ProgramState vars funs) (FunctionCallAtomic name args) = do
+interpretAtomic (ProgramState vars funs t) (FunctionCallAtomic name args) = do
   let isBuiltIn = Map.lookup name getAllBuiltIns
   case isBuiltIn of
     Just (BuiltIn _ _ fn) -> do
@@ -94,23 +84,23 @@ interpretAtomic (ProgramState vars funs) (FunctionCallAtomic name args) = do
       case fun of
         Just (FunctionDefinitionStatement (Function _ argDef _ body)) -> do
           params <- mapExpressionToParam argDef args
-          let fnScope = ProgramState (Map.union params vars) funs
+          let fnScope = ProgramState (Map.union params vars) funs t
           (ScopeResult innerVars ret) <- returnSkipWrapper (InterpretState fnScope Nothing) body True
-          let (ProgramState newVars _) = updateOuterStateV (ProgramState vars funs) innerVars
+          let (ProgramState newVars _ _) = updateOuterStateV (ProgramState vars funs t) innerVars
           return (ScopeResult newVars ret)
         _ -> error $ "Function not found: " ++ name
   where
     getArgValues :: [Expression] -> IO [Value]
     getArgValues exprs =
       mapM
-        (interpretExpression (ProgramState vars funs))
+        (interpretExpression (ProgramState vars funs t))
         exprs
         Data.Functor.<&> Prelude.map (\(ScopeResult _ (Just v)) -> v)
 
     mapExpressionToParam :: [VariableDeclaration] -> [Expression] -> IO (Map Name Value)
     mapExpressionToParam [] [] = pure Map.empty
     mapExpressionToParam (VariableDeclaration n _ : rest) (expression : restExp) = do
-      (ScopeResult _ (Just val)) <- interpretExpression (ProgramState vars funs) expression
+      (ScopeResult _ (Just val)) <- interpretExpression (ProgramState vars funs t) expression
       restMap <- mapExpressionToParam rest restExp
       return (Map.insert n val restMap)
     mapExpressionToParam _ _ = error "Invalid number of arguments"
@@ -127,32 +117,32 @@ returnSkipWrapper state [] inFunction =
     else return (ScopeResult (variables (programState state)) Nothing)
 
 interpretControl :: ProgramState -> Control -> IO InterpretState
-interpretControl (ProgramState vars funs) (IfControl test body elseBody) = do
-  (BoolValue testValue) <- isTestValue (ProgramState vars funs) test
+interpretControl (ProgramState vars funs t) (IfControl test body elseBody) = do
+  (BoolValue testValue) <- isTestValue (ProgramState vars funs t) test
   if testValue
     then do
-      (ScopeResult innerVars ret) <- returnSkipWrapper (InterpretState (ProgramState vars funs) Nothing) body False
-      return $ InterpretState (updateOuterStateV (ProgramState vars funs) innerVars) ret
+      (ScopeResult innerVars ret) <- returnSkipWrapper (InterpretState (ProgramState vars funs t) Nothing) body False
+      return $ InterpretState (updateOuterStateV (ProgramState vars funs t) innerVars) ret
     else do
       case elseBody of
         Just elseStatements -> do
           -- TODO: extract cancellable statements function
-          (ScopeResult innerVars ret) <- returnSkipWrapper (InterpretState (ProgramState vars funs) Nothing) elseStatements False
-          return $ InterpretState (updateOuterStateV (ProgramState vars funs) innerVars) ret
-        Nothing -> return $ InterpretState (ProgramState vars funs) Nothing
-interpretControl (ProgramState vars funs) (WhileControl test body) = do
-  (BoolValue testValue) <- isTestValue (ProgramState vars funs) test
+          (ScopeResult innerVars ret) <- returnSkipWrapper (InterpretState (ProgramState vars funs t) Nothing) elseStatements False
+          return $ InterpretState (updateOuterStateV (ProgramState vars funs t) innerVars) ret
+        Nothing -> return $ InterpretState (ProgramState vars funs t) Nothing
+interpretControl (ProgramState vars funs t) (WhileControl test body) = do
+  (BoolValue testValue) <- isTestValue (ProgramState vars funs t) test
   if testValue
     then do
-      (InterpretState innerVars ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs) Nothing) body
+      (InterpretState innerVars ret) <- foldM interpretStatement (InterpretState (ProgramState vars funs t) Nothing) body
       case ret of
-        Just value -> return $ InterpretState (updateOuterState (ProgramState vars funs) innerVars) (Just value)
-        Nothing -> interpretControl (updateOuterState (ProgramState vars funs) innerVars) (WhileControl test body)
-    else return $ InterpretState (ProgramState vars funs) Nothing
+        Just value -> return $ InterpretState (updateOuterState (ProgramState vars funs t) innerVars) (Just value)
+        Nothing -> interpretControl (updateOuterState (ProgramState vars funs t) innerVars) (WhileControl test body)
+    else return $ InterpretState (ProgramState vars funs t) Nothing
 
 isTestValue :: ProgramState -> Expression -> IO Value
-isTestValue (ProgramState vars funs) test = do
-  (ScopeResult _ (Just testValue)) <- interpretExpression (ProgramState vars funs) test
+isTestValue s test = do
+  (ScopeResult _ (Just testValue)) <- interpretExpression s test
   if not (isBoolValue testValue)
     then do error "Control statement test must be a boolean value."
     else return testValue

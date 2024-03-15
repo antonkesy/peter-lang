@@ -21,6 +21,16 @@ getFunctionMap inStatments =
     isFunctionDefinition _ = False
     getFunctionName (FunctionDefinitionStatement (Function name _ _ _)) = name
 
+getCustomTypeMap :: [Statement] -> Map Name Struct
+getCustomTypeMap inStatments =
+  let rawMap = Map.fromList $ Prelude.map (\item -> (getStructName item, getStruct item)) (Prelude.filter isStructDefinition inStatments)
+   in rawMap
+  where
+    isStructDefinition (StructStatement _) = True
+    isStructDefinition _ = False
+    getStructName (StructStatement (Struct name _)) = name
+    getStruct (StructStatement s) = s
+
 ensureVoidFunctionReturn :: Map Name Statement -> Map Name Statement
 ensureVoidFunctionReturn = Map.mapWithKey ensureVoidReturn
   where

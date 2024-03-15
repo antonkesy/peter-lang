@@ -7,9 +7,9 @@ import Text.Parsec.String
 
 parseType :: Parser Type
 parseType =
-  (string "void" >> return UnitType)
-    <|> (string "int" >> return IntType)
-    <|> (string "float" >> return FloatType)
-    <|> (string "bool" >> return BoolType)
-    <|> (string "str" >> return StringType)
+  try (string "void" >> return UnitType)
+    <|> try (string "int" >> return IntType)
+    <|> try (string "float" >> return FloatType)
+    <|> try (string "bool" >> return BoolType)
+    <|> try (string "str" >> return StringType)
     <|> (CustomType <$> parseName)

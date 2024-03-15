@@ -41,6 +41,5 @@ runPeter sourceCode = do
   case result of
     Left err -> putStrLn $ "Parse error: " ++ show err
     Right program -> do
-      -- putStrLn "Parsed program:"
       -- print program
       interpret program

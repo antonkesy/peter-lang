@@ -14,3 +14,5 @@ interpretLiteral UnitLiteral = do
   return UnitValue
 interpretLiteral (StringLiteral value) = do
   return $ StringValue value
+interpretLiteral UndefinedLiteral = do
+  return UndefinedValue

@@ -3,6 +3,7 @@ module Unit.Parser.Statement (allTests) where
 import AST
 import Data.Either (fromRight, isRight)
 import Parser.Statement
+import Parser.Struct
 import Test.HUnit
 import Text.Parsec (parse)
 
@@ -12,12 +13,13 @@ allTests =
     TestLabel "functions" testFunctions,
     TestLabel "return" testReturn,
     TestLabel "if" testIf,
-    TestLabel "while" testWhile
+    TestLabel "while" testWhile,
+    TestLabel "struct" testStruct
   ]
 
 emptyTestStatement :: Statement
 emptyTestStatement =
-  VariableStatement
+  VariableDefinitionStatement
     ( Variable
         (VariableDeclaration "test" IntType)
         (AtomicExpression (LiteralAtomic (IntLiteral 0)))
@@ -31,7 +33,7 @@ testSimple = TestCase $ do
     (isRight (parse parseStatement "" ""))
   assertEqual
     "int i = 1;"
-    (VariableStatement (Variable (VariableDeclaration "i" IntType) (AtomicExpression (LiteralAtomic (IntLiteral 1)))))
+    (VariableDefinitionStatement (Variable (VariableDeclaration "i" IntType) (AtomicExpression (LiteralAtomic (IntLiteral 1)))))
     (fromRight emptyTestStatement (parse parseStatement "" "int i = 1;"))
   assertEqual
     "k = 2;"
@@ -74,7 +76,7 @@ testFunctions = TestCase $ do
         "main"
         []
         UnitType
-        [ VariableStatement (Variable (VariableDeclaration "i" IntType) (AtomicExpression (LiteralAtomic (IntLiteral 1)))),
+        [ VariableDefinitionStatement (Variable (VariableDeclaration "i" IntType) (AtomicExpression (LiteralAtomic (IntLiteral 1)))),
           AssignmentStatement (Assignment "i" (AtomicExpression (LiteralAtomic (IntLiteral 2))))
         ]
     )
@@ -148,3 +150,33 @@ testWhile = TestCase $ do
         )
     )
     (either (const emptyTestStatement) ControlStatement (parse parseControl "" "while true { return 0; }"))
+
+testStruct :: Test
+testStruct = TestCase $ do
+  assertEqual
+    "struct Name {}"
+    (Struct "Name" [])
+    (fromRight (Struct "DEFAULT" []) (parse parseStruct "" "struct Name {}"))
+  assertEqual
+    "struct Name {}"
+    (either (const emptyTestStatement) StructStatement (parse parseStruct "" "struct Name {}"))
+    (fromRight emptyTestStatement (parse parseStatement "" "struct Name {}"))
+  assertEqual
+    "struct Name {\
+    \  int x;\
+    \  str n;\
+    \  Name next;\
+    \}"
+    (Struct "Name" [VariableDeclaration "x" IntType, VariableDeclaration "n" StringType, VariableDeclaration "next" (CustomType "Name")])
+    ( fromRight
+        (Struct "DEFAULT" [])
+        ( parse
+            parseStruct
+            ""
+            "struct Name {\
+            \  int x;\
+            \  str n;\
+            \  Name next;\
+            \}"
+        )
+    )

@@ -55,4 +55,4 @@ parseAtomic :: Parser Atomic
 parseAtomic =
   LiteralAtomic <$> try parseLiteral
     <|> try parseFunctionCallAtomic
-    <|> VariableAtomic <$> try parseName
+    <|> VariableAtomic <$> try parseExistingVariableName

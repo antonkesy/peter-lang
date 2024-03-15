@@ -11,6 +11,7 @@ parseLiteral =
     <|> try parseFloatLiteral
     <|> try parseIntLiteral
     <|> try praseStringLiteral
+    <|> try (char '?' >> return UndefinedLiteral)
 
 parseIntLiteral :: Parser Literal
 parseIntLiteral = do
