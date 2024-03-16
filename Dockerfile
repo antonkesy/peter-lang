@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04 as base
 
 ENV TZ=Europe
 ENV DEBIAN_FRONTEND noninteractive
@@ -14,18 +14,25 @@ RUN stack --compiler ghc-9.4.7 setup
 RUN apt-get -y install python3-pip
 RUN pip install pre-commit
 
-# formatter
-RUN stack install ormolu
+FROM base as build
 
 WORKDIR /peter-lang
-
 COPY . /peter-lang
-
-# cancel the build if there are formatting errors
-RUN ormolu --mode check $(find . -name '*.hs')
 
 # build project
 RUN stack build
+
+FROM build as exe
+ENTRYPOINT ["./peter.sh"]
+CMD ["--help"]
+
+FROM build as test
+
+# formatter
+RUN stack install ormolu
+
+# cancel the build if there are formatting errors
+# RUN ormolu --mode check $(find . -name '*.hs')
 
 # run tests
 RUN stack test

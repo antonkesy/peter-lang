@@ -33,3 +33,5 @@ for item in "${file_paths[@]}"; do
     IFS=':' read -r file expected_output <<< "$item"
     check_stdout "$file" "$expected_output"
 done
+
+echo "All tests passed"

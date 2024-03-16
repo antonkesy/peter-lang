@@ -95,6 +95,7 @@ toInt =
     valueToInt :: [Value] -> Int
     valueToInt val = case val of
       [IntValue i] -> i
+      [FloatValue f] -> truncate f
       [StringValue s] -> read s
       _ -> error ("No matching type for toInt: " ++ show val)
 

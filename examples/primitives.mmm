@@ -1,0 +1,16 @@
+void v = ();
+bool = true;
+int i = 1;
+float f = 2.0;
+str s = "hello";
+
+println(str(i));
+println(str(f));
+
+if 1 > int("0") {
+    println("bigger")
+}
+
+if 1 < int(3.2) {
+    println("smaller")
+}

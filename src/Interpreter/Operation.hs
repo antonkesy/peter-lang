@@ -34,7 +34,9 @@ interpretOperation Gt (FloatValue left) (FloatValue right) = BoolValue $ left > 
 interpretOperation Le (FloatValue left) (FloatValue right) = BoolValue $ left <= right
 interpretOperation Ge (FloatValue left) (FloatValue right) = BoolValue $ left >= right
 interpretOperation Eq (FloatValue left) (FloatValue right) = BoolValue $ left == right
+interpretOperation Neq (FloatValue left) (FloatValue right) = BoolValue $ left /= right
 -- String
 interpretOperation Plus (StringValue left) (StringValue right) = StringValue $ left ++ right
+interpretOperation Eq (StringValue left) (StringValue right) = BoolValue $ left == right
 -- Invalid
 interpretOperation operator left right = error $ "Unsupported operation: " ++ show operator ++ " " ++ show left ++ " " ++ show right
