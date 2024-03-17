@@ -1,16 +1,48 @@
 struct T {
   int x;
-  int y;
 }
 
 T n;
 n.x = 2;
 println(str(n.x))
 
-int i = 3;
 
 T n1;
-n1.y = i;
+n1 = n;
 
 println(str(n1.x))
-println(str(n1.y))
+
+n1.x = 3;
+
+println(str(n.x))
+println(str(n1.x))
+
+
+
+struct E {
+  int x;
+}
+
+struct Y {
+  str x;
+  E t;
+}
+
+
+Y n;
+
+n.x = "hello";
+n.t.x = 2;
+
+println(n.x)
+println(str(n.t.x))
+
+Y n1;
+n1 = n;
+
+println(str(n1.t.x))
+
+n1.t.x = 3;
+
+println(str(n.t.x))
+println(str(n1.t.x))

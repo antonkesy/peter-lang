@@ -15,28 +15,25 @@ RUN apt-get -y install python3-pip
 RUN pip install pre-commit
 
 FROM base as build
-
 WORKDIR /peter-lang
 COPY . /peter-lang
-
-# build project
 RUN stack build
 
 FROM build as exe
 ENTRYPOINT ["./peter.sh"]
 CMD ["--help"]
 
-FROM build as test
-
+FROM base as test
 # formatter
 RUN stack install ormolu
-
 # cancel the build if there are formatting errors
 # RUN ormolu --mode check $(find . -name '*.hs')
-
-# run tests
+WORKDIR /peter-lang
+COPY . /peter-lang
+RUN stack build
 RUN stack test
 
+# E2E tests
 WORKDIR /peter-lang/test/E2E/Interpreter/examples
 RUN ./check_examples.sh
 WORKDIR /peter-lang

@@ -4,16 +4,41 @@ module AST (module AST) where
 
 type Name = String
 
-data Operator = Plus | Minus | Multiply | Divide | Modulus | And | Or | Not | Eq | Neq | Lt | Gt | Le | Ge
+data Operator
+  = Plus
+  | Minus
+  | Multiply
+  | Divide
+  | Modulus
+  | And
+  | Or
+  | Not
+  | Eq
+  | Neq
+  | Lt
+  | Gt
+  | Le
+  | Ge
   deriving (Show, Eq)
 
-data Literal = IntLiteral Int | FloatLiteral Float | BoolLiteral Bool | UnitLiteral | StringLiteral String | UndefinedLiteral
+data Literal
+  = IntLiteral Int
+  | FloatLiteral Float
+  | BoolLiteral Bool
+  | UnitLiteral
+  | StringLiteral String
+  | UndefinedLiteral
   deriving (Show, Eq)
 
-data Atomic = LiteralAtomic Literal | VariableAtomic Name | FunctionCallAtomic Name [Expression]
+data Atomic
+  = LiteralAtomic Literal
+  | VariableAtomic Name
+  | FunctionCallAtomic Name [Expression]
   deriving (Show, Eq)
 
-data Expression = OperationExpression Expression Operator Expression | AtomicExpression Atomic
+data Expression
+  = OperationExpression Expression Operator Expression
+  | AtomicExpression Atomic
   deriving (Show, Eq)
 
 data VariableDeclaration = VariableDeclaration Name Type
@@ -27,7 +52,14 @@ data Assignment = Assignment Name Expression
 
 type Comment = String
 
-data Type = IntType | FloatType | BoolType | UnitType | CustomType Name | StringType | UndefinedType
+data Type
+  = IntType
+  | FloatType
+  | BoolType
+  | UnitType
+  | CustomType Name
+  | StringType
+  | UndefinedType
   deriving (Show, Eq)
 
 data Control

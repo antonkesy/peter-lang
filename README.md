@@ -115,9 +115,10 @@ t.x = 2;
 ## Limitations & Issues
 
 - left side of operation has to be atomic (because of [left recursive grammar](https://en.wikipedia.org/wiki/Left_recursion))
-- no deep copies of structs (yet)
+- no arrays (yet)
 - many bugs
-- bad error messages from parser
+- bad error messages from parser and interpreter
+- types are optional and currently not always strictly enforced
 
 ## Installation
 

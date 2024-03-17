@@ -58,6 +58,7 @@ library
     , optparse-applicative >=0.17.0
     , parsec >=3.1.16 && <4
     , prettyprinter >=1.7.1 && <2
+    , split ==0.2.5
     , text >=1.2.4
   default-language: Haskell2010
 
@@ -75,6 +76,7 @@ executable peter-exe
     , parsec >=3.1.16 && <4
     , peter
     , prettyprinter >=1.7.1 && <2
+    , split ==0.2.5
     , text >=1.2.4
   default-language: Haskell2010
 
@@ -101,5 +103,6 @@ test-suite peter-test
     , parsec >=3.1.16 && <4
     , peter
     , prettyprinter >=1.7.1 && <2
+    , split ==0.2.5
     , text >=1.2.4
   default-language: Haskell2010

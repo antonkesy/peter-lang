@@ -25,21 +25,15 @@ interpret (Program statements) = do
 interpretStatement :: InterpretState -> Statement -> IO InterpretState
 interpretStatement (InterpretState state _) (VariableDefinitionStatement (Variable (VariableDeclaration name t) expression)) = do
   (ScopeResult innerVars ret) <- interpretExpression state expression
-  let newState = updateOuterStateV state innerVars
-      newState' = addStructMembersToState newState name t
-  return (InterpretState (updateState newState' name ret) Nothing)
+  let newState = updateOuterStateValue state innerVars
+  return (InterpretState (addVariable newState name t ret) Nothing)
 interpretStatement (InterpretState state _) (VariableDeclarationStatement (VariableDeclaration name t)) = do
-  let newState = updateState state name (Just UndefinedValue)
-      newState' = addStructMembersToState newState name t
-  return (InterpretState newState' Nothing)
+  let newState = addVariable state name t (Just UndefinedValue)
+  return (InterpretState newState Nothing)
 interpretStatement (InterpretState state _) (AssignmentStatement (Assignment name expression)) = do
-  case Map.lookup name (variables state) of
-    Just UndefinedValue -> error "Can't copy structs" -- TODO: deep copy structs
-    _ -> do
-      (ScopeResult innerVars ret) <- interpretExpression state expression
-      let newState = updateOuterStateV state innerVars
-      -- TODO: deep copy structs
-      return (InterpretState (updateState newState name ret) Nothing)
+  (ScopeResult innerVars ret) <- interpretExpression state expression
+  let newState = updateOuterStateValue state innerVars
+  return (InterpretState (updateVariable newState name ret) Nothing)
 interpretStatement (InterpretState state _) (ExpressionStatement expression) = do
   _ <- interpretExpression state expression
   return (InterpretState state Nothing)
@@ -47,7 +41,7 @@ interpretStatement (InterpretState state _) (FunctionDefinitionStatement _) = do
   return (InterpretState state Nothing)
 interpretStatement (InterpretState state _) (ReturnStatement expression) = do
   (ScopeResult innerVars ret) <- interpretExpression state expression
-  let newState = updateOuterStateV state innerVars
+  let newState = updateOuterStateValue state innerVars
   return (InterpretState newState ret)
 interpretStatement (InterpretState state _) (ControlStatement control) = do
   interpretControl state control
@@ -67,11 +61,9 @@ interpretAtomic :: ProgramState -> Atomic -> IO ScopeResult
 interpretAtomic (ProgramState vars _ _) (LiteralAtomic literal) = do
   ret <- interpretLiteral literal
   return (ScopeResult vars (Just ret))
-interpretAtomic (ProgramState vars _ _) (VariableAtomic name) = do
-  let varValue = Map.lookup name vars
-  return $ case varValue of
-    Just value -> ScopeResult vars (Just value)
-    Nothing -> error $ "Variable not found: " ++ name
+interpretAtomic (ProgramState vars f t) (VariableAtomic name) =
+  let varValue = getVariable (ProgramState vars f t) name
+   in return (ScopeResult vars varValue)
 interpretAtomic (ProgramState vars funs t) (FunctionCallAtomic name args) = do
   let isBuiltIn = Map.lookup name getAllBuiltIns
   case isBuiltIn of
@@ -86,7 +78,7 @@ interpretAtomic (ProgramState vars funs t) (FunctionCallAtomic name args) = do
           params <- mapExpressionToParam argDef args
           let fnScope = ProgramState (Map.union params vars) funs t
           (ScopeResult innerVars ret) <- returnSkipWrapper (InterpretState fnScope Nothing) body True
-          let (ProgramState newVars _ _) = updateOuterStateV (ProgramState vars funs t) innerVars
+          let (ProgramState newVars _ _) = updateOuterStateValue (ProgramState vars funs t) innerVars
           return (ScopeResult newVars ret)
         _ -> error $ "Function not found: " ++ name
   where
@@ -95,7 +87,10 @@ interpretAtomic (ProgramState vars funs t) (FunctionCallAtomic name args) = do
       mapM
         (interpretExpression (ProgramState vars funs t))
         exprs
-        Data.Functor.<&> Prelude.map (\(ScopeResult _ (Just v)) -> v)
+        Data.Functor.<&> Prelude.map getValue
+    getValue :: ScopeResult -> Value
+    getValue (ScopeResult _ (Just v)) = v
+    getValue (ScopeResult _ Nothing) = error "Value not found"
 
     mapExpressionToParam :: [VariableDeclaration] -> [Expression] -> IO (Map Name Value)
     mapExpressionToParam [] [] = pure Map.empty
@@ -122,13 +117,13 @@ interpretControl (ProgramState vars funs t) (IfControl test body elseBody) = do
   if testValue
     then do
       (ScopeResult innerVars ret) <- returnSkipWrapper (InterpretState (ProgramState vars funs t) Nothing) body False
-      return $ InterpretState (updateOuterStateV (ProgramState vars funs t) innerVars) ret
+      return $ InterpretState (updateOuterStateValue (ProgramState vars funs t) innerVars) ret
     else do
       case elseBody of
         Just elseStatements -> do
           -- TODO: extract cancellable statements function
           (ScopeResult innerVars ret) <- returnSkipWrapper (InterpretState (ProgramState vars funs t) Nothing) elseStatements False
-          return $ InterpretState (updateOuterStateV (ProgramState vars funs t) innerVars) ret
+          return $ InterpretState (updateOuterStateValue (ProgramState vars funs t) innerVars) ret
         Nothing -> return $ InterpretState (ProgramState vars funs t) Nothing
 interpretControl (ProgramState vars funs t) (WhileControl test body) = do
   (BoolValue testValue) <- isTestValue (ProgramState vars funs t) test
