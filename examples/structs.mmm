@@ -8,7 +8,7 @@ println(str(n.x))
 
 
 T n1;
-n1 = n;
+n1 = n; // copy
 
 println(str(n1.x))
 
@@ -17,7 +17,7 @@ n1.x = 3;
 println(str(n.x))
 println(str(n1.x))
 
-
+// embedded struct
 
 struct E {
   int x;

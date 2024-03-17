@@ -1,10 +1,11 @@
 module Parser.Comment (module Parser.Comment) where
 
-import AST
 import Control.Monad (void)
 import Parser.EndOfLine (eol)
 import Text.Parsec
 import Text.Parsec.String
+
+type Comment = String
 
 consumeComment :: Parser ()
 consumeComment =
@@ -19,7 +20,9 @@ parseComment =
 
 parseSingleLineComment :: Parser Comment
 parseSingleLineComment =
-  string "//" *> manyTill anyChar (try eol)
+  string "//" *> manyTill anyChar eoi
+  where
+    eoi = void eol <|> lookAhead eof -- don't consume eof
 
 parseMultiLineComment :: Parser Comment
 parseMultiLineComment =

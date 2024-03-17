@@ -46,9 +46,9 @@ parseAtomicExpression =
 parseFunctionCallAtomic :: Parser Atomic
 parseFunctionCallAtomic = do
   name <- try parseName
-  _ <- char '('
-  args <- try (parseExpression `sepBy` (spaces' >> char ',' >> spaces'))
-  _ <- char ')'
+  _ <- spaces' *> char '(' <* spaces'
+  args <- try ((spaces *> parseExpression <* spaces') `sepBy` (spaces' >> char ',' >> spaces'))
+  _ <- spaces' *> char ')'
   return $ FunctionCallAtomic name args
 
 parseAtomic :: Parser Atomic

@@ -50,8 +50,6 @@ data Variable = Variable VariableDeclaration Expression
 data Assignment = Assignment Name Expression
   deriving (Show, Eq)
 
-type Comment = String
-
 data Type
   = IntType
   | FloatType

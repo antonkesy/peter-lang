@@ -13,7 +13,7 @@ main =
     ( TestList
         ( Unit.Parser.Assignment.allTests
             ++ Unit.Parser.Atomic.allTests
-            -- ++ Unit.Parser.Comment.allTests
+            ++ Unit.Parser.Comment.allTests
             ++ Unit.Parser.Expression.allTests
             ++ Unit.Parser.Program.allTests
             ++ Unit.Parser.Statement.allTests

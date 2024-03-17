@@ -1,0 +1,9 @@
+// comment
+print("A"); // comment
+// comment
+
+/* This is a comment
+   that spans multiple lines */
+
+print( "B" /* inline comment */ );
+//comment

@@ -8,7 +8,7 @@ import Text.Parsec.String
 space' :: Parser ()
 space' =
   void space
-    -- <|> consumeComment -- TODO: enable comments
+    <|> consumeComment
     <|> void newline
     <|> void tab
 

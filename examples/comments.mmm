@@ -1,0 +1,9 @@
+// comment
+println("Hello, World!"); // comment
+// comment
+
+/* This is a comment
+   that spans multiple lines */
+
+println( "Hello, World!" /* inline comment */ );
+//comment
