@@ -10,7 +10,7 @@ The missing link between C and Python
 
 C style syntax with Python like runtime interpretation and built in functions.
 
-### Main
+### [Main](./examples/main_hello_world.mmm)
 
 Main function `void main() {}` is the entry point.
 
@@ -26,7 +26,7 @@ Alternately, statements are executed from top to bottom in case no main is found
 print("Hello, World!");
 ```
 
-### Primitives
+### [Primitives](./examples/primitives.mmm)
 
 - void
 - bool
@@ -34,13 +34,13 @@ print("Hello, World!");
 - float
 - str
 
-### Conversion
+### [Conversion](./examples/primitives.mmm)
 
 - `str(1)` -> `"1"`
 - `int("1")` -> `1`
 - `float("1.3")` -> `1.3`
 
-#### Operations
+#### [Operations](./examples/primitives.mmm)
 
 There is no operator precedence
 
@@ -60,7 +60,7 @@ There is no operator precedence
 |    &&     |  x   |  ✓   | ✓   | x     | x   |
 |   \|\|    |  x   |  ✓   | ✓   | x     | x   |
 
-### Flow Control
+### [Flow Control](./examples/control.mmm)
 
 If:
 
@@ -82,7 +82,7 @@ while j < 10 {
 }
 ```
 
-### Functions
+### [Functions](./examples/functions.mmm)
 
 ```
 int f() {
@@ -94,7 +94,7 @@ void main() {
 }
 ```
 
-### Structs
+### [Structs](./examples/structs.mmm)
 
 ```
 struct T {
@@ -106,11 +106,11 @@ T t;
 t.x = 2;
 ```
 
-### Built In
+### [Built In](./examples/hello_input.mmm)
 
-- print -> prints
-- println -> prints line
-- input -> reads stdin
+- print -> prints string without buffering
+- println -> print + appends newline at the end
+- input -> reads stdin and outputs str
 
 ## Limitations & Issues
 
@@ -119,6 +119,18 @@ t.x = 2;
 - many bugs
 - bad error messages from parser and interpreter
 - types are optional and currently not always strictly enforced
+
+## Missing/Planned Features
+
+- Arrays
+- Classes (or something similar)
+- String manipulation
+- Multiple files support
+- Enums
+- Pattern matching
+- switch
+- for
+- define grammar
 
 ## Installation
 

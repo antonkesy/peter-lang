@@ -14,3 +14,6 @@ if 1 > int("0") {
 if 1 < int(3.2) {
     println("smaller")
 }
+
+i = i + 5;
+println(str(i));
