@@ -9,11 +9,10 @@ file_paths=(
     "main_hello_world.mmm:Hello, World!"
     "short_hello_world.mmm:Hello, World!"
     "print.mmm:Hello, World!1"
-    "structs.mmm:2223hello2223"
+    "structs.mmm:2223hello222390"
     "comments.mmm:AB"
 )
 
-# Function to run program over file and check stdout
 check_stdout() {
     file="$1"
     expected_output="$2"

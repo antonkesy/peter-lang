@@ -17,6 +17,7 @@ n1.x = 3;
 print(str(n.x))
 print(str(n1.x))
 
+// embedded struct
 
 struct E {
   int x;
@@ -45,3 +46,20 @@ n1.t.x = 3;
 
 print(str(n.t.x))
 print(str(n1.t.x))
+
+// recursive struct
+
+struct X {
+  X x;
+  int i;
+}
+
+X y;
+
+y.i = 9;
+
+print(str(y.i));
+
+y.x.x.x.x.i = 0;
+
+print(str(y.x.x.x.x.i));

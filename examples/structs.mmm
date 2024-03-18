@@ -46,3 +46,21 @@ n1.t.x = 3;
 
 println(str(n.t.x))
 println(str(n1.t.x))
+
+
+// recursive struct
+
+struct X {
+  X x;
+  int i;
+}
+
+X y;
+
+y.i = 3;
+
+println(str(y.i));
+
+y.x.x.x.x.i = 4;
+
+println(str(y.x.x.x.x.i));
